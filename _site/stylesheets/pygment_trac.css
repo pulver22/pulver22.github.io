@@ -72,3 +72,10 @@
 	border: 1px solid #000; 
   	padding: 3px;
 }
+
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
