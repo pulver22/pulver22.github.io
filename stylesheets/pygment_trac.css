@@ -67,3 +67,8 @@
 .type-csharp .highlight .nn { color: #000000 }
 .type-csharp .highlight .s { color: #A31515 }
 .type-csharp .highlight .sc { color: #A31515 }
+
+.imageborder {
+	border: 1px solid #000; 
+  	padding: 3px;
+}
