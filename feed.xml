@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>mikehamer - robotics, programming, control</title>
-    <description>Hi, I&#39;m Mike Hamer, a PhD student with the Institute for Dynamic Systems and Control. I&#39;m researching distributed learning and robot localization.</description>
-    <link>http://mikehamer.info/</link>
-    <atom:link href="http://mikehamer.info/feed.xml" rel="self" type="application/rss+xml"/>
+    <title>riccardopolvara - robotics, programming, obstacle avoidance</title>
+    <description>Hi, I&#39;m Riccardo Polvara, a PhD student with the Autonomous Marine Systems Research Group, Plymouth University. I&#39;m researching path planning and obstacle avoidance."</description>
+    <link>http://riccardopolvara.info/</link>
+    <atom:link href="http://riccardopolvara.info/feed.xml" rel="self" type="application/rss+xml"/>
     <pubDate>Thu, 08 Oct 2015 18:21:53 +0200</pubDate>
     <lastBuildDate>Thu, 08 Oct 2015 18:21:53 +0200</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
-    
+
   </channel>
 </rss>
