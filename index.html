@@ -1,72 +1,260 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>Pulver22.GitHub.io by pulver22</title>
-  </head>
 
-  <body>
-    <div id="container">
-      <div class="inner">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <header>
-          <h1>Riccardo Polvara</h1>
-          <h2><em><div class="right">Simplicity is the ultimate sophistication - Leonardo da Vinci</em></h2>
-          <br>
-        </header>
+  <title>pulver22 - robotics, programming, obstacle detection</title>
+  <meta name="description" content="Hi, I'm Riccardo Polvara, a PhD student with the Autonomous Marine Systems Research Group, Plymouth University. I'm researching path planning and obstacle avoidance.">
+  <meta name="author" content="Riccardo Polvara">
 
-        <a id="swatch-link" href="index.html">Home</a></li>
-        <a id="swatch-link" href="projects.html">Projects</a></li>
+  <!-- CSS -->
+  <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="/assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href="/assets/css/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="canonical" href="http://pulver22.github.io/">
+  <link rel="alternate" type="application/atom+xml" title="riccardopolvara - robotics, programming, obstacle detection" href="http://pulver22.github.io/feed.xml" />
+
+  <!-- IE 9 Fallback-->
+  <!--[if IE 9]>
+    <link href="/assets/css/ie.css" rel="stylesheet">
+  <![endif]-->
+
+  <!-- GOOGLE FONTS -->
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400italic,400,600,700' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400italic,700,400,300' rel='stylesheet' type='text/css'>
+
+  <!-- FAVICONS -->
+  <link rel="shortcut icon" href="/assets/ico/favicon.ico?v=2" />
+  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/assets/ico/apple-touch-icon-57x57.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114x114.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72x72.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/assets/ico/apple-touch-icon-144x144.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="60x60" href="/assets/ico/apple-touch-icon-60x60.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/assets/ico/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="76x76" href="/assets/ico/apple-touch-icon-76x76.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/assets/ico/apple-touch-icon-152x152.png" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-196x196.png" sizes="196x196" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-64x64.png" sizes="64x64" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-48x48.png" sizes="48x48" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-24x24.png" sizes="24x24" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-16x16.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="/assets/ico/favicon-128x128.png" sizes="128x128" />
+  <meta name="msapplication-square70x70logo" content="/assets/ico/mstile-70x70.png" />
+  <meta name="msapplication-square150x150logo" content="/assets/ico/mstile-150x150.png" />
+  <meta name="msapplication-wide310x150logo" content="/assets/ico/mstile-310x150.png" />
+  <meta name="msapplication-square310x310logo" content="/assets/ico/mstile-310x310.png" />
+  <meta name="application-name" content="riccardopolvara - robotics, programming, obstacle detection"/>
+  <meta name="msapplication-TileColor" content="#ffffff"/>
+</head>
+
+<body>
+	<!-- WRAPPER -->
+	<div class="wrapper">
 
 
-        <hr>
-
-        <section id="just-me">
-          <h3>
-<a id="just-me" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a><font size=6>Just me</font></h3>
-
-<img src="/images/old.jpg" class="imageborder" width="150" height="150" align="right" >
-
-<p>I just got my MSc from Politecnico di Milano after having specialized in Artificial Intelligence and Robotics with the supervision of my advisor Francesco Amigoni. <br> My main interests are on Autonomous Agent and Multiagent Systems. <br> Since March 2015 until July 2015 I was an external researcher at Mobile Robotic & Olfaction Lab. at Örebro Universitet, Sweden. During this period I completed my master thesis with the contribution of Professor Achim Lilienthal and Dr. Erik Schaffernicht.</p>
-
-<br>
-<h3>
-<a id="random-stuff" class="anchor" href="#random-stuff" aria-hidden="true"><span class="octicon octicon-link"></span></a><font size=6>Random Stuff</font></h3>
-
-<p>I love listening to music (rock'n roll, punk, folk..). I follow many sport (expecially football and basketball) and I am the "Pallacanestro Cantù" reporter for <a href="http://www.basketinside.com"> Basketinside.com</a> website.</p>
-
-<h3>
-<a id="coordinates" class="anchor" href="#coordinates" aria-hidden="true"><span class="octicon octicon-link"></span></a><font size=6>Coordinates</font></h3>
-
-<p> <strong>Politecnico di Milano</strong> <br>34/5 Via Ponzio, Milano, IT 02233 <br><a href="http://www.google.com/recaptcha/mailhide/d?k=01eHNZBPxqqYneB0SSK92FSA==&amp;c=fSIJzBtcDePBvm6x3siMjK8PBlGON-2Wk2ej8W9LKrc=" onclick="window.open('http://www.google.com/recaptcha/mailhide/d?k\07501eHNZBPxqqYneB0SSK92FSA\75\75\46c\75fSIJzBtcDePBvm6x3siMjK8PBlGON-2Wk2ej8W9LKrc\075', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;" title="Reveal this e-mail address">***@***.it</a></p>
+    <!-- NAVBAR -->
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav">
+						<span class="sr-only">Toggle Navigation</span>
+						<i class="fa fa-bars"></i>
+					</button>
+					<a href="/" class="navbar-brand navbar-logo">
+						<img src="/assets/img/logo/riccardopolvara-logo-circle-144x144.png" alt="Repute - Responsive Multipurpose Bootstrap Theme">
+					</a>
+				</div>
+				<!-- MAIN NAVIGATION -->
+				<div id="main-nav" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-left">
 
 
-        <footer id="footer">
-               <div class="links">
-            <div class="left">
-            <a href="https://github.com/pulver22">GitHub</a>
-            <a href="https://facebook.com/pulver91">Facebook</a>
-            <a href="https://plus.google.com/u/0/+RiccardoPolvara/about">Google+</a>
-            <a href="https://www.linkedin.com/profile/view?id=AAIAABl79-sB5Trl_7HDoGwDc-6mExlxq0NSDs8&trk=nav_responsive_tab_profile">LinkedIn</a>
-            </div>
 
-            <div class="right"><a href="#top">Back to top</a></p></div>
+						<li >
+							<a href="/">whoami</a>
+						</li>
 
-          </div>
 
-          <br><br>
-            This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
 
-      </div>
-    </div>
-  </body>
+						<li >
+							<a href="/publications/">publications</a>
+						</li>
+
+
+
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+
+						<li>
+							<a href="https://facebook.com/pulver91"><i class="social-icon fa fa-facebook"></i></a>
+						</li>
+
+
+						<li>
+							<a href="https://github.com/pulver22"><i class="social-icon fa fa-github"></i></a>
+						</li>
+
+
+						<li>
+							<a href="mailto:pulver22@gmail.com"><i class="social-icon fa fa-envelope"></i></a>
+						</li>
+
+					</ul>
+				</div>
+				<!-- END MAIN NAVIGATION -->
+			</div>
+		</nav>
+		<!-- END NAVBAR -->
+
+
+<div class="page-content">
+	<div class="container">
+<!-- INTRO -->
+<section>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-9">
+				<h2 class="section-heading">Hi, I'm Riccardo</h2>
+				<p class="lead">Hi, I'm Riccardo Polvara, a roboticist, programmer, and PhD student. I'm researching in the fields of obstacle avoidance and path planning at the <a href="https://www.fose1.plymouth.ac.uk/autonomous_marine_systems/">Autonomous Marine Systems research group, Plymouth University</a>.</p>
+
+				<p>What excites me most about these fields are the challenging, multidisciplinary problems that require me to use my background in Computer Engineering, Computer Science and Control Systems to develop an integrated solution. I am particularly motivated by the development and efficient implementation of novel algorithms that enable robots to learn from experience, and from each other.</p>
+
+		    <p>If you are interested in my work, please <a href="mailto:pulver22@gmail.com">let me know</a>—I would be very interested to hear of potential collaborations!</p>
+			</div>
+			<div class="col-md-3">
+				<img src="/assets/img/RikyHusky.jpg" class="img-responsive img-circle" alt="Image Intro">
+			</div>
+		</div>
+	</div>
+</section>
+<!-- END INTRO -->
+
+
+<!-- RECENT WORKS -->
+
+<section class="recent-works">
+	<div class="container">
+		<h2 class="section-heading pull-left">Select Publications</h2>
+		<!-- <a href="#" class="btn btn-primary pull-right">See all works</a> -->
+		<div class="clearfix"></div>
+		<div class="portfolio-static">
+			<div class="row">
+
+
+				<div class="col-md-4">
+					<div class="portfolio-item">
+						<div class="overlay"></div>
+						<div class="info">
+							<h4 class="title">Fusing ultra-wideband range measurements with accelerometers and rate gyroscopes for quadrocopter state estimation</h4>
+							<p class="brief-description">ICRA 2015</p>
+							<a href="/publications/#ICRA15" class="btn">read more</a>
+						</div>
+						<div class="media-wrapper">
+							<img src="/assets/img/papers/Quadrocopter Ultra-Wideband Localization.jpg" alt="Item Thumbnail"/>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="portfolio-item">
+						<div class="overlay"></div>
+						<div class="info">
+							<h4 class="title">The Flight Assembled Architecture Installation: Cooperative construction with flying machines </h4>
+							<p class="brief-description">IEEE Control Systems 2014</p>
+							<a href="/publications/#CS14" class="btn">read more</a>
+						</div>
+						<div class="media-wrapper">
+							<img src="/assets/img/papers/Flight Assembled Architecture.jpg" alt="Item Thumbnail"/>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="portfolio-item">
+						<div class="overlay"></div>
+						<div class="info">
+							<h4 class="title">Knowledge Transfer for High-Performance Quadrocopter Maneuvers</h4>
+							<p class="brief-description">IROS 2013</p>
+							<a href="/publications/#IROS13" class="btn">read more</a>
+						</div>
+						<div class="media-wrapper">
+							<img src="/assets/img/papers/Quadrocopter Slalom.png" alt="Item Thumbnail"/>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- END RECENT WORKS -->
+
+</div></div>
+
+
+
+<!-- FOOTER -->
+<footer>
+	<div class="container">
+		<div class="row text-center">
+			If you are interested in my work, please let me know; I would be very interested to hear of potential collaborations!
+
+			<ul class="list-inline social-icons">
+
+				<li class="">
+					<a href="https://facebook.com/pulver91"><i class="fa fa-facebook"></i></a>
+				</li>
+
+
+				<li class="">
+					<a href="https://github.com/pulver22"><i class="fa fa-github"></i></a>
+				</li>
+
+
+				<li class="">
+					<a href="mailto:pulver22@gmail.com"><i class="fa fa-envelope"></i></a>
+				</li>
+
+			</ul>
+		</div>
+	</div>
+	<!-- COPYRIGHT -->
+	<!-- <div class="text-center copyright">
+		&copy;2015 Mike Hamer. Site generated using <a href="http://jekyllrb.com/">Jekyll</a> and hosted on <a href="https://pages.github.com/">Github Pages</a>.
+	</div> -->
+	<!-- END COPYRIGHT -->
+</footer>
+<!-- END FOOTER -->
+	</div>
+	<!-- END WRAPPER -->
+
+	<!-- JAVASCRIPTS -->
+	<script src="/assets/js/jquery-2.1.1.min.js"></script>
+	<script src="/assets/js/bootstrap.min.js"></script>
+	<script src="/assets/js/plugins/slick/slick.min.js"></script>
+	<script src="/assets/js/plugins/stellar/jquery.stellar.min.js"></script>
+	<script src="/assets/js/plugins/jquery-easypiechart/jquery.easypiechart.min.js"></script>
+	<script src="/assets/js/plugins/autohidingnavbar/jquery.bootstrap-autohidingnavbar.min.js"></script>
+	<script src="/assets/js/repute-scripts.js"></script>
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-37282589-1', 'auto');
+	  ga('send', 'pageview');
+
+	</script>
+</body>
+
+
 </html>
