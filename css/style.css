@@ -3,7 +3,9 @@ body {
   line-height: 1.7;
   color: #4d4d4d;
   font-weight: 300;
-  font-size: 1rem; }
+  font-size: 1rem;
+  heigth:100%;
+}
 
 ::-moz-selection {
   background: #000;
@@ -19,7 +21,22 @@ a {
   transition: .3s all ease; }
   a:hover {
     text-decoration: none; }
-
+footer {
+  background-color: #49494b;
+  /* padding-top: 20px; */
+  color: #dfe6e9;
+  bottom:0;
+  /* left:25%; */
+  position:absolute;
+  margin-top: -100px;
+  width:100%;
+}
+.site-wrap{
+  height:100%;
+  /* padding: 20px; */
+  /* padding-bottom: 120px; */
+}
+  
 .text-black {
   color: #000 !important; }
 
