@@ -15,9 +15,10 @@
 	<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/css/main.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="/assets/css/main.css">
 	<link rel="canonical" href="http://pulver22.github.io/">
-  <link href="./css/main.css" rel="stylesheet" type="text/css">
-
+	<link rel="alternate" type="application/atom+xml"
+		title="riccardopolvara - robotics, programming, obstacle detection" href="http://pulver22.github.io/feed.xml" />
 
 	<!-- IE 9 Fallback-->
 	<!--[if IE 9]>
@@ -25,9 +26,12 @@
   <![endif]-->
 
 	<!-- GOOGLE FONTS -->
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300' rel='stylesheet'type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400italic,400,600,700' rel='stylesheet'type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400italic,700,400,300'rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300' rel='stylesheet'
+		type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400italic,400,600,700' rel='stylesheet'
+		type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400italic,700,400,300'
+		rel='stylesheet' type='text/css'>
 
 	<!-- FAVICONS -->
 	<link rel="shortcut icon" href="/assets/ico/favicon.ico?v=2" />
@@ -55,9 +59,63 @@
 	<meta name="msapplication-TileColor" content="#ffffff" />
 </head>
 
+<style>
+	body,
+	html,
+	.container-fluid {
+		height: 100%;
+	}
+
+	.top-buffer {
+		margin-top: 20px;
+	}
+
+	.center1 {
+		/* margin-bottom: 45px; */
+	}
+
+	.introm {
+		width: 50%;
+	}
+
+	footer {
+		background-color: #636e72;
+		/* padding-top: 20px; */
+		color: #dfe6e9;
+		bottom:0;
+		/* left:25%; */
+		position:absolute;
+		/* margin-top: -100px; */
+		width:100%;
+	}
+	.page-content{
+		height:100%;
+		/* padding: 20px; */
+		/* padding-bottom: 120px; */
+	}
+
+	.icons a {
+		color: #dfe6e9;
+	}
+
+	.jumbotron {
+		margin-bottom: 60px;
+	}
+
+	.odd {
+		background-color: #636e72;
+		padding: 10px;
+		color: #dfe6e9;
+	}
+	.wrapper{
+		min-height:100%;
+	}
+</style>
+
 <body>
 	<!-- WRAPPER -->
 	<div class="wrapper">
+
 
 		<!-- NAVBAR -->
 		<nav class="navbar navbar-default" role="navigation">
@@ -68,8 +126,8 @@
 						<span class="sr-only">Toggle Navigation</span>
 						<i class="fa fa-bars"></i>
 					</button>
-					<a href="index.html" class="navbar-brand navbar-logo">
-						<img src="./assets/img/logo/riccardopolvara-logo-circle-144x144.png"
+					<a href="/" class="navbar-brand navbar-logo">
+						<img src="/assets/img/logo/riccardopolvara-logo-circle-144x144.png"
 							alt="Repute - Responsive Multipurpose Bootstrap Theme">
 					</a>
 				</div>
@@ -124,9 +182,12 @@
 		<!-- END NAVBAR -->
 
 
-		<div class="main-content">
+		<div class="page-content">
 			<div class="container mainbit">
-					<div class="row">
+				<!-- INTRO -->
+				<section>
+					<div class="container">
+						<div class="row">
 							<div class="col-md-9">
 								<h2 class="section-heading">Ciao, I'm Riccardo</h2>
 								<p class="lead">
@@ -171,10 +232,14 @@
 									</p>
 							</div>
 							<div class="col-md-3">
-								<img src="./assets/img/RikyHusky.jpg" class="img-responsive img-circle"
+								<img src="/assets/img/RikyHusky.jpg" class="img-responsive img-circle"
 									alt="Image Intro">
 							</div>
-				</div>
+						</div>
+					</div>
+				</section>
+				<!-- END INTRO -->
+
 			</div>
 		</div>
 
@@ -216,8 +281,13 @@
 	<!-- END WRAPPER -->
 
 	<!-- JAVASCRIPTS -->
-	<script src="./assets/js/jquery-2.1.1.min.js"></script>
-	<script src="./assets/js/bootstrap.min.js"></script>
+	<script src="/assets/js/jquery-2.1.1.min.js"></script>
+	<script src="/assets/js/bootstrap.min.js"></script>
+	<script src="/assets/js/plugins/slick/slick.min.js"></script>
+	<script src="/assets/js/plugins/stellar/jquery.stellar.min.js"></script>
+	<script src="/assets/js/plugins/jquery-easypiechart/jquery.easypiechart.min.js"></script>
+	<script src="/assets/js/plugins/autohidingnavbar/jquery.bootstrap-autohidingnavbar.min.js"></script>
+	<script src="/assets/js/repute-scripts.js"></script>
 	<script>
 		(function (i, s, o, g, r, a, m) {
 			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
