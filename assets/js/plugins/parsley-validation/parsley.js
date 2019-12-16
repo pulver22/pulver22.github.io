@@ -15,7 +15,7 @@
   }
 }(function ($) {
   // small hack for requirejs if jquery is loaded through map and not path
-  // see http://requirejs.org/docs/jquery.html
+  // see https://requirejs.org/docs/jquery.html
   if ('undefined' === typeof $ && 'undefined' !== typeof window.jQuery)
     $ = window.jQuery;
   var ParsleyUtils = {
@@ -95,8 +95,8 @@
         .replace(/_/g, '-')
         .toLowerCase();
     },
-    // http://support.microsoft.com/kb/167820
-    // http://stackoverflow.com/questions/19999388/jquery-check-if-user-is-using-ie
+    // https://support.microsoft.com/kb/167820
+    // https://stackoverflow.com/questions/19999388/jquery-check-if-user-is-using-ie
     msieversion: function () {
       var
         ua = window.navigator.userAgent,
@@ -1876,7 +1876,7 @@ if ('undefined' !== typeof window.ParsleyValidator)
   window.ParsleyValidator.addCatalog('en', window.ParsleyConfig.i18n.en, true);
 
 //     Parsley.js 2.0.6
-//     http://parsleyjs.org
+//     https://parsleyjs.org
 //     (c) 20012-2014 Guillaume Potier, Wisembly
 //     Parsley may be freely distributed under the MIT license.
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="https://www.w3.org/2005/Atom">
   <channel>
     <title>riccardopolvara - robotics, programming, obstacle avoidance</title>
-    <description>Hi, I&#39;m Riccardo Polvara, a Postdoctoral research fellowin the <a href="http://computational-learning.net/">Computational Learning for Autonomous Systems (CLAS)</a> team within the <a href="https://lcas.lincoln.ac.uk/">Lincoln Center for Autonomous Systems (LCAS)</a>, University of Lincoln (UK).</description>
+    <description>Hi, I&#39;m Riccardo Polvara, a Postdoctoral research fellowin the <a href="https://computational-learning.net/">Computational Learning for Autonomous Systems (CLAS)</a> team within the <a href="https://lcas.lincoln.ac.uk/">Lincoln Center for Autonomous Systems (LCAS)</a>, University of Lincoln (UK).</description>
     <link>https://pulver22.github.io/</link>
-    <atom:link href="http://pulver22.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://pulver22.github.io/feed.xml" rel="self" type="application/rss+xml"/>
     <pubDate>Thu, 08 Oct 2015 18:21:53 +0200</pubDate>
     <lastBuildDate>Thu, 08 Oct 2015 18:21:53 +0200</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
