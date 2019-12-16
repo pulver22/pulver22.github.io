@@ -30,7 +30,7 @@ column-count: 4;
 -webkit-column-width: 25%;
 -moz-column-width: 25%;
 column-width: 25%; 
-margin-bottom: 100px;}
+margin-bottom: 150px;}
 
 @media (max-width: 450px) {
 .gallery {
