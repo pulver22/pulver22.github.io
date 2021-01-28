@@ -87,8 +87,10 @@
 							<a href="news.html">news</a>
 						</li>
 
-						<li>
-							<a href="photos.html">photos</a>
+						<li class="nav-item dropdown active">
+							<a href="../photos.html" class="nav-link dropdown-toggle" data-toggle="dropdown">photos</a>
+							<div id="dropdown_photos_menu">
+							</div>
 						</li>
 
 
@@ -134,14 +136,13 @@
 								<a href="https://lcas.lincoln.ac.uk">Lincoln Center for Autonomous Systems
 									(LCAS)</a>, University of Lincoln (UK). I am also associate member of the
 								<a href="https://alr.anthropomatik.kit.edu">Autonomous Learning Robots (ALR) Lab</a>,
-									Karlsruher Institut fur Technologie (KIT) (Germany). I am currently involved in the
-									project called <a href="https://www.ncnr.org.uk">National Centre for Nuclear
+								Karlsruher Institut fur Technologie (KIT) (Germany). I am currently involved in the
+								project called <a href="https://www.ncnr.org.uk">National Centre for Nuclear
 									Robotics (NCNR)</a>, funded by EPSRC and comprising many international leaders in
 								AI and Robotics. In the project I'm involved, my duties are related to the
 								development of learning-based solution for autonomous navigation and recovery of
 								a mobile manipulator. My direct advisors are <a href="https://www.hanheide.net/">Marc
-									Hanheide</a> and <a
-									href="https://alr.anthropomatik.kit.edu/21_65.php">Gerhard
+									Hanheide</a> and <a href="https://alr.anthropomatik.kit.edu/21_65.php">Gerhard
 									Neumann</a>.
 							</p>
 
@@ -215,6 +216,24 @@
 	<!-- for lateral navbar-->
 	<script src="assets/js/jquery-2.1.1.min.js"></script>
 	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/jquery-migrate-3.0.1.min.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/jquery.stellar.min.js"></script>
+	<script src="js/jquery.countdown.min.js"></script>
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/bootstrap-datepicker.min.js"></script>
+	<script src="js/swiper.min.js"></script>
+	<script src="js/aos.js"></script>
+
+	<script src="js/picturefill.min.js"></script>
+	<script src="js/lightgallery-all.min.js"></script>
+	<script src="js/jquery.mousewheel.min.js"></script>
+
+	<script src="js/main.js"></script>
 	<script>
 		(function (i, s, o, g, r, a, m) {
 			i['GoogleAnalyticsObject'] = r;
@@ -231,6 +250,13 @@
 		ga('create', 'UA-94119449-1', 'auto');
 		ga('send', 'pageview');
 	</script>
+
+	<script>
+		$(document).ready(function () {
+			$('#dropdown_photos_menu').load('./reusable_dropdown_photo_menu.html');
+		});
+	</script>
+
 </body>
 
 

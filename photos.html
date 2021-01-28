@@ -44,6 +44,8 @@
 
 	<!-- <link rel="stylesheet" href="css/style.css"> -->
 
+
+
 	<!-- GOOGLE FONTS -->
 	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300' rel='stylesheet'
 		type='text/css'>
@@ -111,8 +113,10 @@
 							<a href="news.html">news</a>
 						</li>
 
-						<li class="active">
-							<a href="photos.html">photos</a>
+						<li class="nav-item dropdown active">
+							<a href="../photos.html" class="nav-link dropdown-toggle" data-toggle="dropdown">photos</a>
+							<div id="dropdown_photos_menu">
+							</div>
 						</li>
 
 
@@ -153,19 +157,63 @@
 					<div class="swiper-container images-carousel">
 						<h2 class="section-heading">Photos</h2>
 						<div class="swiper-wrapper">
-							
+
+
+
+
+
+
+
+
+
+
 							<div class="swiper-slide">
 								<div class="image-wrap">
 									<div class="image-info">
-										<h2 class="mb-3">Tuscany</h2>
-										<a href="gallery_html/tuscany.html"
+										<h2 class="mb-3">Belton House</h2>
+										<a href="gallery_html/belton_house.html"
 											class="btn btn-outline-white py-2 px-4">More
 											Photos</a>
 									</div>
-									<img src="images/photos/covers/florence.jpg" alt="Image">
+									<img src="images/photos/covers/belton_house.jpg" alt="Image">
 								</div>
 							</div>
-							
+
+
+							<div class="swiper-slide">
+								<div class="image-wrap">
+									<div class="image-info">
+										<h2 class="mb-3">Donna Nook</h2>
+										<a href="gallery_html/donna_nook.html"
+											class="btn btn-outline-white py-2 px-4">More
+											Photos</a>
+									</div>
+									<img src="images/photos/covers/donna_nook.jpg" alt="Image">
+								</div>
+							</div>
+
+							<div class="swiper-slide">
+								<div class="image-wrap">
+									<div class="image-info">
+										<h2 class="mb-3">Iceland</h2>
+										<a href="gallery_html/iceland.html" class="btn btn-outline-white py-2 px-4">More
+											Photos</a>
+									</div>
+									<img src="images/photos/covers/iceland.jpg" alt="Image">
+								</div>
+							</div>
+
+							<div class="swiper-slide">
+								<div class="image-wrap">
+									<div class="image-info">
+										<h2 class="mb-3">Langford Lowfields</h2>
+										<a href="gallery_html/langford_lowfields.html" class="btn btn-outline-white py-2 px-4">More
+											Photos</a>
+									</div>
+									<img src="images/photos/covers/langford.jpeg" alt="Image">
+								</div>
+							</div>
+
 							<div class="swiper-slide">
 								<div class="image-wrap">
 									<div class="image-info">
@@ -180,11 +228,22 @@
 							<div class="swiper-slide">
 								<div class="image-wrap">
 									<div class="image-info">
-										<h2 class="mb-3">Iceland</h2>
-										<a href="gallery_html/iceland.html"
-											class="btn btn-outline-white py-2 px-4">More Photos</a>
+										<h2 class="mb-3">Paris</h2>
+										<a href="gallery_html/paris.html" class="btn btn-outline-white py-2 px-4">More
+											Photos</a>
 									</div>
-									<img src="images/photos/covers/iceland.jpg" alt="Image">
+									<img src="images/photos/covers/paris.jpg" alt="Image">
+								</div>
+							</div>
+
+							<div class="swiper-slide">
+								<div class="image-wrap">
+									<div class="image-info">
+										<h2 class="mb-3">Porto</h2>
+										<a href="gallery_html/porto.html" class="btn btn-outline-white py-2 px-4">More
+											Photos</a>
+									</div>
+									<img src="images/photos/covers/porto.jpg" alt="Image">
 								</div>
 							</div>
 
@@ -198,31 +257,31 @@
 									<img src="images/photos/covers/sanfrancisco.jpg" alt="Image">
 								</div>
 							</div>
-							
-							<div class="swiper-slide">
-								<div class="image-wrap">
-									<div class="image-info">
-										<h2 class="mb-3">Paris</h2>
-										<a href="gallery_html/paris.html" class="btn btn-outline-white py-2 px-4">More
-											Photos</a>
-									</div>
-									<img src="images/photos/covers/paris.jpg" alt="Image">
-								</div>
-							</div>
-							
-							<div class="swiper-slide">
-								<div class="image-wrap">
-									<div class="image-info">
-										<h2 class="mb-3">Porto</h2>
-										<a href="gallery_html/porto.html" class="btn btn-outline-white py-2 px-4">More
-											Photos</a>
-									</div>
-									<img src="images/photos/covers/porto.jpg" alt="Image">
-								</div>
-							</div>
-							
 
-							
+							<div class="swiper-slide">
+								<div class="image-wrap">
+									<div class="image-info">
+										<h2 class="mb-3">Sicily</h2>
+										<a href="gallery_html/sicily.html"
+											class="btn btn-outline-white py-2 px-4">More Photos</a>
+									</div>
+									<img src="images/photos/covers/sicily.jpeg" alt="Image">
+								</div>
+							</div>
+
+							<div class="swiper-slide">
+								<div class="image-wrap">
+									<div class="image-info">
+										<h2 class="mb-3">Tuscany</h2>
+										<a href="gallery_html/tuscany.html" class="btn btn-outline-white py-2 px-4">More
+											Photos</a>
+									</div>
+									<img src="images/photos/covers/florence.jpg" alt="Image">
+								</div>
+							</div>
+
+
+
 						</div>
 
 						<div class="swiper-pagination"></div>
@@ -273,7 +332,7 @@
 		<!-- for lateral navbar-->
 		<script src="assets/js/jquery-2.1.1.min.js"></script>
 		<script src="assets/js/bootstrap.min.js"></script>
-		
+
 		<script src="js/jquery-3.3.1.min.js"></script>
 		<script src="js/jquery-migrate-3.0.1.min.js"></script>
 		<script src="js/jquery-ui.js"></script>
@@ -293,11 +352,19 @@
 
 		<script src="js/main.js"></script>
 
+
 		<script>
 			$(document).ready(function () {
 				$('#lightgallery').lightGallery();
 			});
 		</script>
+
+		<script>
+			$(document).ready(function () {
+				$('#dropdown_photos_menu').load('reusable_dropdown_photo_menu.html');
+			});
+		</script>
+
 
 	</div>
 	<!-- END WRAPPER -->
