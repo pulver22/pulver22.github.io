@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>riccardopolvara - robotics, artificial intelligence, photography</title>
+  <meta name="description"
+    content="Hi, I'm Riccardo Polvara, a Postdoctoral researcher with the Lincoln Centre for Autonomous Systems, University of Lincoln. I'm researching path planning and obstacle avoidance.">
+  <meta name="author" content="Riccardo Polvara">
+
+  <!-- CSS -->
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="../assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href="../assets/css/main.css" rel="stylesheet" type="text/css">
+  <link href="../css/main.css" rel="stylesheet" type="text/css">
+
+  <link rel="canonical" href="https://pulver22.github.io/">
+  <link rel="alternate" type="application/atom+xml" title="riccardopolvara - robotics, artificial intelligence, photography"
+    href="https://pulver22.github.io/feed.xml" /> 
+
+  <link rel="stylesheet" href="../css/lightgallery.min.css">
+  <!-- <link rel="stylesheet" href="../css/style.css"> -->
+
+  <!-- GOOGLE FONTS -->
+  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400italic,400,600,700' rel='stylesheet'
+    type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400italic,700,400,300'
+    rel='stylesheet' type='text/css'>
+
+
+  <!-- FAVICONS -->
+  <link rel="shortcut icon" href="../assets/ico/favicon.ico?v=2" />
+  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="../assets/ico/apple-touch-icon-57x57.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114x114.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72x72.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144x144.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="60x60" href="../assets/ico/apple-touch-icon-60x60.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="../assets/ico/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="76x76" href="../assets/ico/apple-touch-icon-76x76.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../assets/ico/apple-touch-icon-152x152.png" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-196x196.png" sizes="196x196" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-64x64.png" sizes="64x64" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-48x48.png" sizes="48x48" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-24x24.png" sizes="24x24" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-16x16.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="../assets/ico/favicon-128x128.png" sizes="128x128" />
+  <meta name="msapplication-square70x70logo" content="assets/ico/mstile-70x70.png" />
+  <meta name="msapplication-square150x150logo" content="assets/ico/mstile-150x150.png" />
+  <meta name="msapplication-wide310x150logo" content="assets/ico/mstile-310x150.png" />
+  <meta name="msapplication-square310x310logo" content="assets/ico/mstile-310x310.png" />
+  <meta name="application-name" content="riccardopolvara - robotics, artificial intelligence, photography" />
+  <meta name="msapplication-TileColor" content="#ffffff" />
+
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+</head>
+
+<body>
+
+  <div class="wrapper">
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target="#main-nav">
+              <span class="sr-only">Toggle Navigation</span>
+              <i class="fa fa-bars"></i>
+            </button>
+            <a href="../index.html" class="navbar-brand navbar-logo">
+              <img src="../assets/img/logo/riccardopolvara-logo-circle-144x144.png">
+            </a>
+          </div>
+          <!-- MAIN NAVIGATION -->
+          <div id="main-nav" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-left">
+  
+  
+  
+              <li>
+                <a href="../index.html">whoami</a>
+              </li>
+
+              <li>
+                <a href="../publications/index.html">publications</a>
+              </li>
+  
+              <li>
+                <a href="../news.html">news</a>
+              </li>
+
+              <li class="nav-item dropdown active">
+                <a href="../photos.html" class="nav-link dropdown-toggle" data-toggle="dropdown">photos</a>
+                <div id="dropdown_photos_menu">
+                </div>
+              </li>
+  
+  
+  
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+  
+              <li>
+                <a href="https://facebook.com/pulver22"><i class="social-icon fa fa-facebook"></i></a>
+              </li>
+  
+  
+              <li>
+                <a href="https://github.com/pulver22"><i class="social-icon fa fa-github"></i></a>
+              </li>
+  
+  
+              <li>
+                <a href="mailto:pulver22@gmail.com"><i class="social-icon fa fa-envelope"></i></a>
+              </li>
+  
+              <li>
+                <a href="https://pulver22.github.io/curriculum_vitae.pdf"> <i class="fa fa-file"></i></a>
+              </li>
+  
+            </ul>
+          </div>
+          <!-- END MAIN NAVIGATION -->
+        </div>
+      </nav>
+
+
+    <div role="main-content">
+      <div class="container">
+        <div class="row justify-content-center">
+
+          <!-- <div class="col-md-9"> -->
+            <div class="row mb-7">
+              <div class="col-12 ">
+                <h2 class="site-section-heading text-center">Peak District Gallery</h2>
+              </div>
+            </div>
+          <!-- </div> -->
+
+        </div>
+
+        <div class="gallery " id="lightgallery">
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mak1_TlZ7VMcalhzbPE4wb-BqcV6B0I9ITwmRuivI_ME_iOK1gZB-E5PiqZPEzSAcpOwqEYrGyzz9_da12XzWpvqvy5dyk_he5KrQRL3wh6mImPd0vFAvsQI2XPvBpY-cOdtlF-FUxFZvHfpKCOr5Yo_T3O1vi21rlKxcmQIcGVV6xpmveAmUvYnaPjxO_YXG?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mak1_TlZ7VMcalhzbPE4wb-BqcV6B0I9ITwmRuivI_ME_iOK1gZB-E5PiqZPEzSAcpOwqEYrGyzz9_da12XzWpvqvy5dyk_he5KrQRL3wh6mImPd0vFAvsQI2XPvBpY-cOdtlF-FUxFZvHfpKCOr5Yo_T3O1vi21rlKxcmQIcGVV6xpmveAmUvYnaPjxO_YXG?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4m_6OY4Q1XuSEnvjaDYvJ1aQ6ZM2TP0pBU82Jp0nyDWCm_WlKN8RbvSRn3JNkbS9w4ZQXmwK7dxP53co_NSOzRChxwH6pHabNBY7cXLdbvCVS1z2BDZzbetmBKU2T6SfZ0D8w88WLBl4MSXj9m_jkmrN0EwMYGRtnx4aZpFt8SJXyHT9LXwH5zraSC2YL-cGVf?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4m_6OY4Q1XuSEnvjaDYvJ1aQ6ZM2TP0pBU82Jp0nyDWCm_WlKN8RbvSRn3JNkbS9w4ZQXmwK7dxP53co_NSOzRChxwH6pHabNBY7cXLdbvCVS1z2BDZzbetmBKU2T6SfZ0D8w88WLBl4MSXj9m_jkmrN0EwMYGRtnx4aZpFt8SJXyHT9LXwH5zraSC2YL-cGVf?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mLL8IsBoJdi5QIL0QbmFUk7ifM7OMAVuZlhtjMzxaU_H2gPlo7a5xEt1VYPG-lHkKBbo5NTqOJZ3DB6s8vI_EgfibQ6EI_JO6Q1kr9jqeXAiQTOmCgXzeo_jI7_ufNhj6zv5ch6ydbXcFIlfSK7gVG0VsfbbaA9cf3eDLTRlYCTXr0i6R0YxlzKPfB6Xu4XjM?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mLL8IsBoJdi5QIL0QbmFUk7ifM7OMAVuZlhtjMzxaU_H2gPlo7a5xEt1VYPG-lHkKBbo5NTqOJZ3DB6s8vI_EgfibQ6EI_JO6Q1kr9jqeXAiQTOmCgXzeo_jI7_ufNhj6zv5ch6ydbXcFIlfSK7gVG0VsfbbaA9cf3eDLTRlYCTXr0i6R0YxlzKPfB6Xu4XjM?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mrsS17bgcRO2WmNLCy7RFvAL8c5nc_QmVzAsACZwHZ84HIxgSlbhR2i44mW2BtctcxUsgv7bwYOsKfTmc5-WjNRxsInWSjsn99XIZGYBLEes1wuwctG35BW3-eHc07ODpuEmPQny1bO06uWGFvb__rHSUXdFHzvdJm59VWNW-Hpma_OKRCZOM_xNjPzGtL065?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mrsS17bgcRO2WmNLCy7RFvAL8c5nc_QmVzAsACZwHZ84HIxgSlbhR2i44mW2BtctcxUsgv7bwYOsKfTmc5-WjNRxsInWSjsn99XIZGYBLEes1wuwctG35BW3-eHc07ODpuEmPQny1bO06uWGFvb__rHSUXdFHzvdJm59VWNW-Hpma_OKRCZOM_xNjPzGtL065?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4meOiGeLHIt6UwLr5RiegljRlUNXm7eNJFgOxOadU799mmHygePXxt71jOR9ydTwRkAr_1sROU8AeP3KbH2fQFE44IZx_1ebuq0Dis-URrg5VCVN3AEQBwhRFcJReMpTJbM1iltO2ZiL0YeKmTkVjJ2zVL3mg47vrb0Zh58RouuFdiF-YTkMLzF9YUuOp2deJy?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4meOiGeLHIt6UwLr5RiegljRlUNXm7eNJFgOxOadU799mmHygePXxt71jOR9ydTwRkAr_1sROU8AeP3KbH2fQFE44IZx_1ebuq0Dis-URrg5VCVN3AEQBwhRFcJReMpTJbM1iltO2ZiL0YeKmTkVjJ2zVL3mg47vrb0Zh58RouuFdiF-YTkMLzF9YUuOp2deJy?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mwZyI-uOSUnLHPWwnnFeZRvWR6dTKiyctPkGnnEFC1GmtwSZVP15WhMG7-6yW83uW3mw9z2mMPlhlDEn9nVprfifWKkIzECr4f7AgGEDb503205UsdG0ACTDtwVTvUzfU1Ks9n-mRwufcFoHBuVRUDqLqKwJT0-k50HrI0K3Wh-hzN6DOVP8xXEQwdnxUq52A?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mwZyI-uOSUnLHPWwnnFeZRvWR6dTKiyctPkGnnEFC1GmtwSZVP15WhMG7-6yW83uW3mw9z2mMPlhlDEn9nVprfifWKkIzECr4f7AgGEDb503205UsdG0ACTDtwVTvUzfU1Ks9n-mRwufcFoHBuVRUDqLqKwJT0-k50HrI0K3Wh-hzN6DOVP8xXEQwdnxUq52A?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mxSTfzpU7NaQF0uGDXH-S06Sc-9hIkvY8dbXYeKmuL6yOSTBQsTiW_mzblNC1LP9wN5JLq4QxVXcQHRjwzc17da4QyHi0UCNKPrpc2pUEgWYSdSDpvl13JyuaKTaxUQTAq_nhxoeuaPC2dmi7621LFUl5T9zwCTCi5a6A5vhxznOm2XG_IAdGOmzhtXzad2yz?width=1365&height=2048&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mxSTfzpU7NaQF0uGDXH-S06Sc-9hIkvY8dbXYeKmuL6yOSTBQsTiW_mzblNC1LP9wN5JLq4QxVXcQHRjwzc17da4QyHi0UCNKPrpc2pUEgWYSdSDpvl13JyuaKTaxUQTAq_nhxoeuaPC2dmi7621LFUl5T9zwCTCi5a6A5vhxznOm2XG_IAdGOmzhtXzad2yz?width=1365&height=2048&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mwYee-dTUsOgrLH0KlPRBoEEdxIPz9eXP2A1_EWkdMYESUGJa_e9rh94xYBHscRwMh_vvgxSKhBG_qoMGBWSrXa3DqXRtxKKi7kTx7RiCcufCa5uNPSwrlcllK8I6o5km2Xc3izqvwz-T4AmxGgn5iPg9rO2CY8Q78rY4oAjK6twi8227dpUaiEqjOxAIjLwS?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mwYee-dTUsOgrLH0KlPRBoEEdxIPz9eXP2A1_EWkdMYESUGJa_e9rh94xYBHscRwMh_vvgxSKhBG_qoMGBWSrXa3DqXRtxKKi7kTx7RiCcufCa5uNPSwrlcllK8I6o5km2Xc3izqvwz-T4AmxGgn5iPg9rO2CY8Q78rY4oAjK6twi8227dpUaiEqjOxAIjLwS?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mgYvWoTzQ7B2oM7vuJDeoljTNLGVi8PHzKaGR2VlvImX0soABwQUMr2kkRfKPS1uCjHPHiSktWKlcFSvi53YgoeQjUdcdOjs_E_6s1OupH97w9q76TJF4n4zCt8AfHmmiviKuwIBu3Bqa6MfZqT_wIujX-ldiYfCNJFs2wAZbhPBOR_UZ-OemTf7EIPncdNFJ?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mgYvWoTzQ7B2oM7vuJDeoljTNLGVi8PHzKaGR2VlvImX0soABwQUMr2kkRfKPS1uCjHPHiSktWKlcFSvi53YgoeQjUdcdOjs_E_6s1OupH97w9q76TJF4n4zCt8AfHmmiviKuwIBu3Bqa6MfZqT_wIujX-ldiYfCNJFs2wAZbhPBOR_UZ-OemTf7EIPncdNFJ?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mkp4l-ru10WxQAAEpB7X5NGz2O1VqIEeTB17oK56RSg6kupGx3ZN-1ivQqbbwWweTgv0bthSTtVS-MGUo-o3GwTXck6quMIckGHPGPyGDHBbKCd9hjzK5ePrmz03hX8-oYE1TmBBhevOt1bOaqPq87kZ7nYmJlRmrhX0emDZwwMS8IvuAEj7Eoyr-rZGybzd1?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mkp4l-ru10WxQAAEpB7X5NGz2O1VqIEeTB17oK56RSg6kupGx3ZN-1ivQqbbwWweTgv0bthSTtVS-MGUo-o3GwTXck6quMIckGHPGPyGDHBbKCd9hjzK5ePrmz03hX8-oYE1TmBBhevOt1bOaqPq87kZ7nYmJlRmrhX0emDZwwMS8IvuAEj7Eoyr-rZGybzd1?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mL4hEYNVBKsHwn0qLOuqPN68M5XkDPpiNx721nuqmAEwzohQd4fHHzigPk1hRzrEjCe43l5nnHQ8DkUuQD42cG-OCFHfLmLWUJCzkY5csddBDgpCdSHQhnhJNiiu61mh2W6T-hKm9D371Jv8ZVYIbV9bIeQlCwu9NfUgqjxL7_ylD3nU5X8-XDHJtaQlqIapR?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mL4hEYNVBKsHwn0qLOuqPN68M5XkDPpiNx721nuqmAEwzohQd4fHHzigPk1hRzrEjCe43l5nnHQ8DkUuQD42cG-OCFHfLmLWUJCzkY5csddBDgpCdSHQhnhJNiiu61mh2W6T-hKm9D371Jv8ZVYIbV9bIeQlCwu9NfUgqjxL7_ylD3nU5X8-XDHJtaQlqIapR?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mGUwPfmv_p2jqTPYrCfXroN5qOJo61Nn_UuuU5DFQH0CqKkhYPH4egpBqZRixqMAcDF9uKfjwvX8mjYrTyTVVbO1fqFktuHjfhQwEMCuT4m6TojVAv71XLSdgEV2fIC1aJx63TFPsoannnVF-SGccrwBJYN0ptj6UjNFkzkPsWfZD6ajIUiKZjsH6mchsOShC?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mGUwPfmv_p2jqTPYrCfXroN5qOJo61Nn_UuuU5DFQH0CqKkhYPH4egpBqZRixqMAcDF9uKfjwvX8mjYrTyTVVbO1fqFktuHjfhQwEMCuT4m6TojVAv71XLSdgEV2fIC1aJx63TFPsoannnVF-SGccrwBJYN0ptj6UjNFkzkPsWfZD6ajIUiKZjsH6mchsOShC?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4maTjG6fstwkhpFWJEww9NBon50eFR_DS_lcmPn8v5FtEWTNgfQZ1RId_wAS9ZJke9HR1dcnVqoffNOCrqTTm9HXLgFSpeoSbGtKRR_amvZzOqkjUtk-AT9K5qyz10jzk4JLGDZP7IZER7SwHWRFPKCmi-ePgXPR9Yq7wjByWnvG-7-DuGb1JcugY9Zc45Ep7P?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4maTjG6fstwkhpFWJEww9NBon50eFR_DS_lcmPn8v5FtEWTNgfQZ1RId_wAS9ZJke9HR1dcnVqoffNOCrqTTm9HXLgFSpeoSbGtKRR_amvZzOqkjUtk-AT9K5qyz10jzk4JLGDZP7IZER7SwHWRFPKCmi-ePgXPR9Yq7wjByWnvG-7-DuGb1JcugY9Zc45Ep7P?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mdvPoSvgPZ_h-OHPcUreMXvbTfkDu-vP3vxiLewmZizPqZH0QyC9loOoK_dDFu2Xotuc5QrS4I6RhH9-LdateHm8u9HNqTaQs-xntrkLsE2nmwIcuKgaST6XdP4uehajNpHScr3lH1WxoRpqfeBbuJMavDTRnoeSZITax5NNcnLQCqVoeURxWlJh7QH-1tVlv?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mdvPoSvgPZ_h-OHPcUreMXvbTfkDu-vP3vxiLewmZizPqZH0QyC9loOoK_dDFu2Xotuc5QrS4I6RhH9-LdateHm8u9HNqTaQs-xntrkLsE2nmwIcuKgaST6XdP4uehajNpHScr3lH1WxoRpqfeBbuJMavDTRnoeSZITax5NNcnLQCqVoeURxWlJh7QH-1tVlv?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4meiWWCbvitwMowCvinpMBs1Khnatt_RBOmwxEjSaxeRCx7k1C9OlTsRF_qyqTnyZJCUJAANeI20QTjPaemE6I3pL-sVIBA0F0jL8dW77FYEE2JSDteDnphKp8X4iNvgWtlOuxUPLUG0IpYo4jKKEU0jzzaIqRFFUaPaZYtevbWUJWvJcn7uIjyfYViJMQeEBI?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4meiWWCbvitwMowCvinpMBs1Khnatt_RBOmwxEjSaxeRCx7k1C9OlTsRF_qyqTnyZJCUJAANeI20QTjPaemE6I3pL-sVIBA0F0jL8dW77FYEE2JSDteDnphKp8X4iNvgWtlOuxUPLUG0IpYo4jKKEU0jzzaIqRFFUaPaZYtevbWUJWvJcn7uIjyfYViJMQeEBI?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mQZpPgfgPGwNE8rjGSm_D-b2eP9iOOhBCG5pPdseRvWy2cZXDKBDTtNtQIixlcjAxULAmvLREHPn3IOew6-aWQLnKDDwe0m1QpqcS0W5xpnKGbFAe9j73C53X_VLuzJbUdjuqUIWKKEROn2uAcMoNJ60FKxaXU5AgPwlSaelC-_V-i3r3WsoQApE2-Tcd5Z9G?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mQZpPgfgPGwNE8rjGSm_D-b2eP9iOOhBCG5pPdseRvWy2cZXDKBDTtNtQIixlcjAxULAmvLREHPn3IOew6-aWQLnKDDwe0m1QpqcS0W5xpnKGbFAe9j73C53X_VLuzJbUdjuqUIWKKEROn2uAcMoNJ60FKxaXU5AgPwlSaelC-_V-i3r3WsoQApE2-Tcd5Z9G?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mztO8nUIOSVdyfGo0iIeJYDaYPIZ8zzRc2KLIleTL4XC41kCTJzFLlrqqR7sUnUak8VXKuQ0ptomqdolSI3VMpik4vpJROTXK6aJRfbjVd28DiZfYI8-SyXVWK7OD8BPXnOEkPWkW_3xtTLgGqi0R1g9-Mg0cFynDWkaZaitNDXKQrunJIiT5ITWqHNNBCZEm?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mztO8nUIOSVdyfGo0iIeJYDaYPIZ8zzRc2KLIleTL4XC41kCTJzFLlrqqR7sUnUak8VXKuQ0ptomqdolSI3VMpik4vpJROTXK6aJRfbjVd28DiZfYI8-SyXVWK7OD8BPXnOEkPWkW_3xtTLgGqi0R1g9-Mg0cFynDWkaZaitNDXKQrunJIiT5ITWqHNNBCZEm?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4m1VSpsPX6KO6JEzvBF_fOu8A314u1DoNxwONA4KjiCGEFMRIK5o4S0A95t40xiVQWjapCq8qj-liu_ijYEB69P3yHk_R9wYx2seICrMDbprXKa-JxZPb8FgrkzHFD5yKrU04sjEodvLplB0UyAYMpa0ECRRXmh8zUpL9eaIR-LTT-0cVZjeBatwmF4Mfxn3Xr?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4m1VSpsPX6KO6JEzvBF_fOu8A314u1DoNxwONA4KjiCGEFMRIK5o4S0A95t40xiVQWjapCq8qj-liu_ijYEB69P3yHk_R9wYx2seICrMDbprXKa-JxZPb8FgrkzHFD5yKrU04sjEodvLplB0UyAYMpa0ECRRXmh8zUpL9eaIR-LTT-0cVZjeBatwmF4Mfxn3Xr?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mR_IZkOMMBY9k1begimBTMyCHP2vM3LEQXopBrtyGYwBNPxnwTNsbp_aMh4pt0LipbmmzVJdADpp0epmtjpcIB4oxE5y9at7cj5X-CV5d0NrMh_JUn525oo69UX-BMNnpeqbyvdmbpBhsDpq7EXmRYnt0ndiPWONAcflOz-dKNcIwEdqW2TXtI7s7HA1vdsVt?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mR_IZkOMMBY9k1begimBTMyCHP2vM3LEQXopBrtyGYwBNPxnwTNsbp_aMh4pt0LipbmmzVJdADpp0epmtjpcIB4oxE5y9at7cj5X-CV5d0NrMh_JUn525oo69UX-BMNnpeqbyvdmbpBhsDpq7EXmRYnt0ndiPWONAcflOz-dKNcIwEdqW2TXtI7s7HA1vdsVt?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mQeGydEBsb1PG7G9yVb3MxfZ9_pyRUP39XKg96owiSpq76oqK7NiR-IZ1q8-S-rylSlmGwD4G1aFZAS4ndIN1neI__hrhV1mg7qCcUGBPSBz-HZUKlvKaEuHycuOEeiBioC73PfGWd8zNDK-xYJLBjO5WVzIouaP2swWvqEUUbrbJJ9SxLrqjxWLunb5HKsse?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mQeGydEBsb1PG7G9yVb3MxfZ9_pyRUP39XKg96owiSpq76oqK7NiR-IZ1q8-S-rylSlmGwD4G1aFZAS4ndIN1neI__hrhV1mg7qCcUGBPSBz-HZUKlvKaEuHycuOEeiBioC73PfGWd8zNDK-xYJLBjO5WVzIouaP2swWvqEUUbrbJJ9SxLrqjxWLunb5HKsse?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4m89U-hyMJl2Lvhl_Oxmz1112pqTEb8AwOXWQnbaAQVNXCPTR2xV6P2YhqJSW6ZMyPNDV-cZGwHSiKkdg4tkZN8l02UbNPlEpjKq39dsKR-2e1RS6uw6MYM1VStMTwQ3hbh7okDbFAMxLIXL69qY1orHi83JwAiavjWtMGpVSbsxtuhv6p0CyuY9ORqKhoIpmO?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4m89U-hyMJl2Lvhl_Oxmz1112pqTEb8AwOXWQnbaAQVNXCPTR2xV6P2YhqJSW6ZMyPNDV-cZGwHSiKkdg4tkZN8l02UbNPlEpjKq39dsKR-2e1RS6uw6MYM1VStMTwQ3hbh7okDbFAMxLIXL69qY1orHi83JwAiavjWtMGpVSbsxtuhv6p0CyuY9ORqKhoIpmO?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mpYLhcKJXxvPp5tKAvrBHyexrp2d0HvzdXO8NaRlLuxriRTba160hoO3eIq7XPUEUYkqNgKXwRWH9PMl-Km4YwNboMaz1eoaU5Q96qQSH0q_VdE3cOFyJzkZ2fQnHtigmwQjCzCL1U3YuziS0euuesGdoO9p1Lbkw5DKaMlNy8XAxaPsCqfWy0FH4vqzk3tT1?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mpYLhcKJXxvPp5tKAvrBHyexrp2d0HvzdXO8NaRlLuxriRTba160hoO3eIq7XPUEUYkqNgKXwRWH9PMl-Km4YwNboMaz1eoaU5Q96qQSH0q_VdE3cOFyJzkZ2fQnHtigmwQjCzCL1U3YuziS0euuesGdoO9p1Lbkw5DKaMlNy8XAxaPsCqfWy0FH4vqzk3tT1?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mkR7S4tGlD0SKp_2ZQky45aHHy27bMs4juMiSkJXumohfjB5E5ezF_z0mpJCuEwSMDTWQrqdH-MA0sNGgm_RnmEwHH_k2Ip93D61OAde0lXP5gxdYWtK547UJ-kPiheU3hEPoEAFQyz57BnbXIvXIVQAC0JBbSn6lrTToXwHT1dGcqFIt2VMqdsxJEhJs0gTg?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mkR7S4tGlD0SKp_2ZQky45aHHy27bMs4juMiSkJXumohfjB5E5ezF_z0mpJCuEwSMDTWQrqdH-MA0sNGgm_RnmEwHH_k2Ip93D61OAde0lXP5gxdYWtK547UJ-kPiheU3hEPoEAFQyz57BnbXIvXIVQAC0JBbSn6lrTToXwHT1dGcqFIt2VMqdsxJEhJs0gTg?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mGz3PuRE2qGuiP9LC0U1mTIV-IgaFEOKbUmrBOVvRjIwNbB8PuGR0KGDQ2nr8HzD-rYiI0VP_-x9ceu03SDjE_587psQR6-RrHBQyW_auWRTrkMiMlc2PKyGG-g_Kei-k77k2aaftmdyDs0o9wtwCON0-jz0DuwShz32vElETzaN2Zjo5degeLL4ROQVYpn0J?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mGz3PuRE2qGuiP9LC0U1mTIV-IgaFEOKbUmrBOVvRjIwNbB8PuGR0KGDQ2nr8HzD-rYiI0VP_-x9ceu03SDjE_587psQR6-RrHBQyW_auWRTrkMiMlc2PKyGG-g_Kei-k77k2aaftmdyDs0o9wtwCON0-jz0DuwShz32vElETzaN2Zjo5degeLL4ROQVYpn0J?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mg9_79--9WIoXZYXWXiM-OfA3OvPUEBkG79X9wtHGuEHfWm7sWE6Q7agw_XdEkdFtqGkWOCBCvg0bLOwfI4SRpFN2mRvKaguQ_2x63ptBKF8-6Y5fAjT-Co8-_eih6xvDplxT9kL6y9EM5nYQGg2KfvCN15vo1q70K-ZpMXnuEKqkm2tXC4LmhyBA8g7sSB3s?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mg9_79--9WIoXZYXWXiM-OfA3OvPUEBkG79X9wtHGuEHfWm7sWE6Q7agw_XdEkdFtqGkWOCBCvg0bLOwfI4SRpFN2mRvKaguQ_2x63ptBKF8-6Y5fAjT-Co8-_eih6xvDplxT9kL6y9EM5nYQGg2KfvCN15vo1q70K-ZpMXnuEKqkm2tXC4LmhyBA8g7sSB3s?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4m0DNg8Ueql-NMmvURI-F_GDU-yP02vYGpCmjKm8Xt93jkP7uOrwrOL_IzdwnLwBhyynS5RUGIoV9UfA-us4-XHTubVXfFsJ39qEOs6lb45GRytKQF8GP1WF_l0n5rbDBeHENFhAuTStnvoA6oJbV_B7R7F__GyoM1-CFfaNZ2nYqPUHTo_SJf61xz5HKLBHcJ?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4m0DNg8Ueql-NMmvURI-F_GDU-yP02vYGpCmjKm8Xt93jkP7uOrwrOL_IzdwnLwBhyynS5RUGIoV9UfA-us4-XHTubVXfFsJ39qEOs6lb45GRytKQF8GP1WF_l0n5rbDBeHENFhAuTStnvoA6oJbV_B7R7F__GyoM1-CFfaNZ2nYqPUHTo_SJf61xz5HKLBHcJ?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+            </div>
+            
+            <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mwlAABolMSqCflWxtHaVjlz2dtMD9FTptaCy0EPL9o7-Q-gbuGZ4Bn5Atuugypf8wqE2fvTAfvzThXIScfKn360yj-AcHML4C_Q8xsB0SdxLaTmVT7a_SF1DxhoyGcKMwwHnZkuf2JCUTakOzI5WX_u8WHqnVgilUXA5pQn8Hy6QuzGMfMBOJw2M5hOwszQFr?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mwlAABolMSqCflWxtHaVjlz2dtMD9FTptaCy0EPL9o7-Q-gbuGZ4Bn5Atuugypf8wqE2fvTAfvzThXIScfKn360yj-AcHML4C_Q8xsB0SdxLaTmVT7a_SF1DxhoyGcKMwwHnZkuf2JCUTakOzI5WX_u8WHqnVgilUXA5pQn8Hy6QuzGMfMBOJw2M5hOwszQFr?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mxgoCmC7CX2tj6FZLkLGvLT5GY8WZwydvsC-XY_W-3tN3OUZX0ySmrr6HH8cFOlM-A6wc36dd_vCRkiLrrEqdhfOy2ozszwZBMJBwkROhO9N4TrbROCPjcUyxuE4DCs7jgXL89sNqZGVh03Fv1TRTh8qI-ggf_Z0f7_XqWmQ2Ur3yBj8OanU0tm7LuT2d4ErD?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mxgoCmC7CX2tj6FZLkLGvLT5GY8WZwydvsC-XY_W-3tN3OUZX0ySmrr6HH8cFOlM-A6wc36dd_vCRkiLrrEqdhfOy2ozszwZBMJBwkROhO9N4TrbROCPjcUyxuE4DCs7jgXL89sNqZGVh03Fv1TRTh8qI-ggf_Z0f7_XqWmQ2Ur3yBj8OanU0tm7LuT2d4ErD?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mc3OqP8hH6hrCUYqCR_yX6Dwtj1CZvmCVvcb7iDgfOCzENkbnhSffCPZP1sBbFn3v2QaW4ckLHV3jOLCm3xmQaZBgikzfh_9qrILCkkViC4kKlDoSBxrsPDk-Zx1i5fbZkSmtiSLzc5qhEAEXWxd6ws97snPhZI3UUMlblo13T64wq8umap4Xl_-HJueY90Mg?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mc3OqP8hH6hrCUYqCR_yX6Dwtj1CZvmCVvcb7iDgfOCzENkbnhSffCPZP1sBbFn3v2QaW4ckLHV3jOLCm3xmQaZBgikzfh_9qrILCkkViC4kKlDoSBxrsPDk-Zx1i5fbZkSmtiSLzc5qhEAEXWxd6ws97snPhZI3UUMlblo13T64wq8umap4Xl_-HJueY90Mg?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mARb7bI60bWZlGs7z18bIO67fxF0Lj-7RwiifjScYlJ7_B0UMoqX0zenhl8K4uxeLNcwrMENIsLJjO7ICqg-7suDd-x1vW8XypkCZdHDQ9nTg6JiNO8F728X4YgQnlLbJDxeMa4an7yDzATueHRSizjZisRF4qIKVsENun7sHOiYq_gesEmDCccQA9Dbr_dd1?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mARb7bI60bWZlGs7z18bIO67fxF0Lj-7RwiifjScYlJ7_B0UMoqX0zenhl8K4uxeLNcwrMENIsLJjO7ICqg-7suDd-x1vW8XypkCZdHDQ9nTg6JiNO8F728X4YgQnlLbJDxeMa4an7yDzATueHRSizjZisRF4qIKVsENun7sHOiYq_gesEmDCccQA9Dbr_dd1?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mrr-_20Uo68aVK459i22Ne61u9Jjipfu9JPN5hZGExppcrfDb1rrrejFhG3O6rC_fwjquiwcJCSabB-CanmCwwpPBoFV9vt9vbwOTn0S3jzsjGc_uf73VYXYjrQWt79PGwmeZCm9o1QOhdYXaJvajWkcrudOsM770jgUHKyOn6xS21-hYgGCgzYLX8Y5LONw0?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mrr-_20Uo68aVK459i22Ne61u9Jjipfu9JPN5hZGExppcrfDb1rrrejFhG3O6rC_fwjquiwcJCSabB-CanmCwwpPBoFV9vt9vbwOTn0S3jzsjGc_uf73VYXYjrQWt79PGwmeZCm9o1QOhdYXaJvajWkcrudOsM770jgUHKyOn6xS21-hYgGCgzYLX8Y5LONw0?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mXx8agLrk9YohOW969NhWEr_UvZibzEBuze4lhtZeECLk8YxGQlRDIeCFz3QuMNLPT7pf5V_5Y2B31FdFXLT9gwyMM3qniL-xjTRihZa5Ey2ADQ2qatatrkO0JtVtU_72SxLCK5id1NB84_4B-hAD1n1oocp_K1o_e9LQIIrjnoNZxpXYZ9VwqDTFUDbaFC3J?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mXx8agLrk9YohOW969NhWEr_UvZibzEBuze4lhtZeECLk8YxGQlRDIeCFz3QuMNLPT7pf5V_5Y2B31FdFXLT9gwyMM3qniL-xjTRihZa5Ey2ADQ2qatatrkO0JtVtU_72SxLCK5id1NB84_4B-hAD1n1oocp_K1o_e9LQIIrjnoNZxpXYZ9VwqDTFUDbaFC3J?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mDXTG4mjw5qhc0IcZJBlua6rxeWqhwO7HgRJHRz3UVKZductyX7w8JBu0UNaieEp5GpFJnRQvvcTsZZfxLGvZXCXFu-RYr4GSx-iho4ydXIfxTlEpJipGXTAUJVcmDm96SmxzvNLG3sMgWeUkMHNqe67VVxtoLPhpHwL6EvE_-VrtWnUdQOeY8py4aMgwPf8b?width=2048&height=3072&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mDXTG4mjw5qhc0IcZJBlua6rxeWqhwO7HgRJHRz3UVKZductyX7w8JBu0UNaieEp5GpFJnRQvvcTsZZfxLGvZXCXFu-RYr4GSx-iho4ydXIfxTlEpJipGXTAUJVcmDm96SmxzvNLG3sMgWeUkMHNqe67VVxtoLPhpHwL6EvE_-VrtWnUdQOeY8py4aMgwPf8b?width=2048&height=3072&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+          </div>
+
+          <div class="md-3 imageuh " data-src="https://db3pap005files.storage.live.com/y4mRtU-NBNeGUbgU8K7Rt3DtkSwdVQO3xBC_ayLu9kRfQPqGPkVUNF9feyQdCfawr9Rwbbi71BVJkaAnvrEx3x2zj2cTCTLF4b1s_hdO3XL7cDsUh2haznMPNRJM1r__NEuNz1gDcXfuPkkG-Ga9O8maFzCl8CppRFPxc4JXMIOVHEjZ6j3jwDOsj1BOjwyxLrn?width=2048&height=1365&cropmode=none"
+            data-sub-html="">
+            <a href="#"><img src="https://db3pap005files.storage.live.com/y4mRtU-NBNeGUbgU8K7Rt3DtkSwdVQO3xBC_ayLu9kRfQPqGPkVUNF9feyQdCfawr9Rwbbi71BVJkaAnvrEx3x2zj2cTCTLF4b1s_hdO3XL7cDsUh2haznMPNRJM1r__NEuNz1gDcXfuPkkG-Ga9O8maFzCl8CppRFPxc4JXMIOVHEjZ6j3jwDOsj1BOjwyxLrn?width=2048&height=1365&cropmode=none" alt="" class="img-fluid img-responsive"></a>
+            </div>
+
+
+
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <div class="row text-center">
+          If you are interested in my work, please let me know; I would be very interested to hear of
+          potential collaborations!
+
+          <ul class="list-inline social-icons">
+
+            <li class="">
+              <a href="https://facebook.com/pulver22"><i class="fa fa-facebook"></i></a>
+            </li>
+
+
+            <li class="">
+              <a href="https://github.com/pulver22"><i class="fa fa-github"></i></a>
+            </li>
+
+
+            <li class="">
+              <a href="mailto:pulver22@gmail.com"><i class="fa fa-envelope"></i></a>
+            </li>
+
+            <li class="">
+              <a href="https://pulver22.github.io/curriculum_vitae.pdf"> <i class="fa fa-file-o"></i></a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+
+
+
+
+  </div>
+
+  <!-- for lateral navbar-->
+	<script src="../assets/js/jquery-2.1.1.min.js"></script> 
+  <script src="../assets/js/bootstrap.min.js"></script>
+  
+  <script src="../js/jquery-3.3.1.min.js"></script>
+  <script src="../js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="../js/jquery-ui.js"></script>
+  <script src="../js/popper.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  <script src="../js/owl.carousel.min.js"></script>
+  <script src="../js/jquery.stellar.min.js"></script>
+  <script src="../js/jquery.countdown.min.js"></script>
+  <script src="../js/jquery.magnific-popup.min.js"></script>
+  <script src="../js/bootstrap-datepicker.min.js"></script>
+  <script src="../js/swiper.min.js"></script>
+  <script src="../js/aos.js"></script>
+
+  <script src="../js/picturefill.min.js"></script>
+  <script src="../js/lightgallery-all.min.js"></script>
+  <script src="../js/jquery.mousewheel.min.js"></script>
+
+  <script src="../js/main.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $('#lightgallery').lightGallery({
+        selector: '.imageuh '
+      });
+    });
+  </script>
+
+  <script>
+    $(document).ready(function (){
+        $('#dropdown_photos_menu').load('../reusable_dropdown_photo_menu.html');
+      });
+  </script>
+
+  </div>
+  <!-- END WRAPPER -->
+
+</body>
+
+</html>
