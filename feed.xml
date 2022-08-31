@@ -2,11 +2,9 @@
 <rss version="2.0" xmlns:atom="https://www.w3.org/2005/Atom">
   <channel>
     <title>riccardopolvara - robotics, artificial intelligence, photography</title>
-    <description>Hi, I&#39;m Riccardo, a Postdoctoral Research Fellow in the
-								<a href="https://lcas.lincoln.ac.uk">Lincoln Center for Autonomous Systems
-									(LCAS)</a>, University of Lincoln (UK). I am also associate member of the
-								<a href="https://alr.anthropomatik.kit.edu">Autonomous Learning Robots (ALR) Lab</a>,
-								Karlsruher Institut fur Technologie (KIT) (Germany).</description>
+    <description>Hi, I&#39;m Riccardo, a Lecturer (Asst. Professor) in Robotics and Autonomous Systems at the a
+								<a href="https://lcas.lincoln.ac.uk">Lincoln Center for Autonomous Systems (LCAS)</a>,
+								University of Lincoln (UK).</description>
     <link>https://pulver22.github.io/</link>
     <atom:link href="https://pulver22.github.io/feed.xml" rel="self" type="application/rss+xml"/>
     <pubDate>Thu, 08 Oct 2015 18:21:53 +0200</pubDate>
