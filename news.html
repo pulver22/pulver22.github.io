@@ -61,7 +61,7 @@
 
 
 		<!-- NAVBAR -->
-		<nav class="navbar navbar-default" role="navigation">
+		<!-- <nav class="navbar navbar-default" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
 					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -72,65 +72,12 @@
 					<a href="index.html" class="navbar-brand navbar-logo">
 						<img src="assets/img/logo/riccardopolvara-logo-circle-144x144.png">
 					</a>
-				</div>
+				</div> -->
 				<!-- MAIN NAVIGATION -->
-				<div id="main-nav" class="navbar-collapse collapse">
-					<ul class="nav navbar-nav navbar-left">
-
-						<li>
-							<a href="index.html">whoami</a>
-						</li>
-
-						<li>
-							<a href="./publications.html">publications</a>
-						</li>
-
-						<li class="active">
-							<a href="teaching.html">teaching</a>
-						</li>
-
-						<li class="active">
-							<a href="news.html">news</a>
-						</li>
-
-						<li class="active">
-							<a href="projects.html">projects</a>
-						</li>
-
-						<li class="nav-item dropdown active">
-							<a href="photos.html" class="nav-link dropdown-toggle" data-toggle="dropdown">photos</a>
-							<div id="dropdown_photos_menu">
-							</div>
-						</li>
-
-
-
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-
-						<li>
-							<a href="https://facebook.com/pulver22"><i class="social-icon fa fa-facebook"></i></a>
-						</li>
-
-
-						<li>
-							<a href="https://github.com/pulver22"><i class="social-icon fa fa-github"></i></a>
-						</li>
-
-
-						<li>
-							<a href="mailto:pulver22@gmail.com"><i class="social-icon fa fa-envelope"></i></a>
-						</li>
-
-						<li>
-							<a href="https://www.dropbox.com/s/e9upikotycolrx2/CV_RiccardoPolvara.pdf?dl=0"> <i class="fa fa-file"></i></a>
-						</li>
-
-					</ul>
-				</div>
+				<div id="navigation"></div>
 				<!-- END MAIN NAVIGATION -->
-			</div>
-		</nav>
+			<!-- </div>
+		</nav> -->
 		<!-- END NAVBAR -->
 		<!-- </div> -->
 
@@ -335,6 +282,12 @@
 	<script>
 		$(document).ready(function () {
 			$('#dropdown_photos_menu').load('./reusable_dropdown_photo_menu.html');
+		});
+	</script>
+
+	<script>
+		$(document).ready(function() {
+			$('#navigation').load('./reusable_navbar.html');
 		});
 	</script>
 
