@@ -79,7 +79,9 @@
 					</a>
 				</div>
 				<!-- MAIN NAVIGATION -->
-				<div id="main-nav" class="navbar-collapse collapse">
+                <!-- <div w3-include-html="reusable_navbar.html"></div> -->
+				<div id="navigation"></div>
+				<!-- <div id="main-nav" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav navbar-left">
 
 
@@ -133,7 +135,7 @@
 						</li>
 
 					</ul>
-				</div>
+				</div> -->
 				<!-- END MAIN NAVIGATION -->
 			</div>
 		</nav>
@@ -252,7 +254,13 @@
 
 	<script>
 		$(document).ready(function () {
-			$('#dropdown_photos_menu').load('./reusable_dropdown_photo_menu.html');
+			$('#dropdown_photos_menu').load('reusable_dropdown_photo_menu.html');
+		});
+	</script>
+	
+	<script>
+		$(document).ready(function() {
+			$('#navigation').load('./reusable_navbar.html');
 		});
 	</script>
 </body>
