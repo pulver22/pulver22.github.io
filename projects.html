@@ -15,8 +15,11 @@
 	<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/css/main.css" rel="stylesheet" type="text/css">
-	<link rel="canonical" href="https://pulver22.github.io/">
 	<link href="css/main.css" rel="stylesheet" type="text/css">
+
+	<link rel="canonical" href="https://pulver22.github.io/">
+	<!-- <link rel="alternate" type="application/atom+xml" -->
+	<!-- title="riccardopolvara - robotics, artificial intelligence, photography" href="https://pulver22.github.io/feed.xml" /> -->
 
 	<!-- GOOGLE FONTS -->
 	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300' rel='stylesheet'
@@ -56,103 +59,170 @@
 	<!-- WRAPPER -->
 	<div class="wrapper">
 
+
 		<!-- NAVBAR -->
 		<div id="navigation"></div>
 
-
 		<div class="main-content">
-			<div class="container mainbit">
-				<div class="row">
-					<div class="col-md-9">
-						<h2 class="section-heading">Ciao, I'm Riccardo</h2>
-						<p class="lead">
+			<div class="container">
+				<!-- INTRO -->
+				<p class="text-left section-heading">
+					Projects
+				</p>
+
+				
+
+				<hr class="my-4">
+				<div class="row top-buffer first odd img-rounded">
+
+					<div class="col-md-6">
+						<h2>Agri-KITTI: a 4D Dataset for Phenotyping and Simultaneous Localization and Mapping in Agricultural Applications						</h2>
 							<p>
-								Ciao,
-								<br>
-								I'm Riccardo, a Lecturer (Asst. Professor) in Robotics and Autonomous Systems at the <a
-									href="https://lcas.lincoln.ac.uk">Lincoln Center for Autonomous Systems (LCAS)</a>,
-								University of Lincoln (UK).
-
-								My research focuses on making robots move autonomously under uncertainty. In order to do so, they must be able to have access to their own sensory data and reason on them.
+							<b>Contribution:</b>
+								<ul>
+								<li>Robust and reproducible navigation plan for data recording</li>
+								<li>Efficient data recording and saving pipeline</li>
+								<li>4D dataset for SLAM application in agricultural domain</li>
+								</ul>
 							</p>
-
-							<p>
-								Previously, I was a Postdoctoral Research Fellow in LCAS and an associate member of the
-								<a href="https://alr.anthropomatik.kit.edu">Autonomous Learning Robots (ALR) Lab</a>,
-								Karlsruher Institut fur Technologie (Germany). I was involved in the
-								European H2020 <a href="https://bacchus-project.eu">BACCHUS</a> project, focused on
-								mobile robotic platforms for active inspection and harvesting in agricultural areas.
-								I've also been part of the
-								<a href="https://www.ncnr.org.uk">National Centre for Nuclear Robotics (NCNR)</a>, a
-								project funded by EPSRC and comprising many international
-								leaders in
-								AI and Robotics. In this project, I developed learning-based solutions for autonomous
-								navigation and recovery of
-								a mobile manipulator.
-								<!-- My direct advisors are <a href="https://www.hanheide.net">Marc
-									Hanheide</a>, <a href="https://alr.anthropomatik.kit.edu/21_65.php">Gerhard
-									Neumann</a> and <a href="https://staff.lincoln.ac.uk/gcielniak">Grzegorz
-									Cielniak</a>. -->
-							</p>
-
-							<p>
-								I obtained a PhD title as a candidate at the <a
-									href="https://www.plymouth.ac.uk/research/autonomous-marine-systems">Autonomous
-									Marine Systems</a> research group, University of Plymouth (UK). There, I
-								applied model-free deep reinforcement learning techniques to the autonomous
-								landing of a drone on the deck of an unmanned surface vehicle. I also hold a BSc
-								and MSc in Computer Engineering from the Politecnico di Milano, Italy.
-							</p>
-
-							<p>
-								What excites me most about these fields are the challenging, multidisciplinary
-								problems that require me to use my background in Computer Engineering, Robotics
-								and Artificial Intelligence to develop an integrated solution. I am particularly
-								motivated by the development and efficient implementation of novel algorithms
-								that enable robots to acquire information from different sensors, integrate
-								them and find a safe path for navigation purpose.
-							</p>
-
-
-							<p>If you are interested in my work, please <a href="mailto:pulver22@gmail.com">let
-									me know</a>—I would be very interested to hear of potential collaborations!
-							</p>
+							<b>Resources:</b> <a href="https://universityoflincoln.sharepoint.com/:b:/s/L-CAS/EdINTBChIjhEv7PTqirVgV0BOvhiRQyBvN_WQoS4kwK--g?e=ixR8WL">Poster</a>
+						</p>
 					</div>
-					<div class="col-md-3">
-						<img src="assets/img/RP_portrait.jpg" class="img-responsive img-circle">
+					<div class="col-md-6">
+						<img class="img-thumbnail" src="images/projects/agri_kitti.png" width="100%" />
+					</div>
+				</div>
+
+				<hr class="my-4">
+				<div class="row top-buffer even">
+					<div class="col-md-6">
+						<img class="img-thumbnail" src="images/projects/pickers_tracking.png" width="100%" />
+					</div>
+					<div class="col-md-6">
+						<h2>Navigate-and-Seek: a Robotics Framework for People Localization in Agricultural Environments						</h2>
+						<p><b>Contribution:</b>
+							<ul>
+							<li>Topological Particle Filter </li>
+							<li>Adoption of NBS for reducing the uncertainty on humans’s location</li>
+							<li>Evaluation on a digital twin of the real world scenario</li>
+							</ul>
+							</p>
+							<b>Resources:</b> <a href="https://youtu.be/gLYIWcQfXHA">Video</a>
+						</p>
+					</div>
+
+				</div>
+
+
+				<hr class="my-4">
+				<div class="row top-buffer odd img-rounded">
+
+					<div class="col-md-6">
+						<h2>Radiation mapping and source localization using a mobile robot and a topological map						</h2>
+						<p><b>Contribution:</b>
+							<ul>
+							<li>Gaussian Process interpolates sensor reading to obtain probabilistic map</li>
+							<li>Graph-based navigation </li>
+							<li>Adoption of NBS for modifying robot behavior (attraction/repulsion)</li>
+							</ul>
+							</p>
+							<b>Resources:</b> <a href="https://youtu.be/9SmibTc4CTI">Video</a>
+						</p>
+					</div>
+					<div class="col-md-6">
+						<img class="img-thumbnail" src="images/projects/radiation.png" width="100%" />
+					</div>
+				</div>
+
+				<hr class="my-4">
+				<div class="row top-buffer even">
+
+					<div class="col-md-6">
+						<img class="img-thumbnail" src="images/projects/rfid_tracking.png" width="100%" />
+					</div>
+					<div class="col-md-6">
+						<h2>Tracking of moving objects based on RFID technology</h2>
+						<p><b>Contribution:</b>
+							<ul>
+							<li>Multi-Criteria Optimization problem</li>
+							<li>Probabilistic sensor model</li>
+							<li>Balanced performance: fast map coverage, reduced travel distance, high tag localization precision</li>
+							</ul>
+							</p>
+							<b>Resources:</b> <a href="https://youtu.be/CnkZuzjbx7w"> Video</a>
+						</p>
+					</div>
+				</div>
+
+				<hr class="my-4">
+				<div class="row top-buffer odd img-rounded">
+
+					<div class="col-md-6">
+						<h2>Autonomous UAV Landing with Deep Reinforcement Learning
+						</h2>
+						<p><b>Contribution:</b>
+							<ul>
+							<li>Autonomous control based only on raw pixels (low-resolution gray scale images)</li>
+							<li>Sim-to-real </li>
+							<li>Human-level performance</li>
+							</ul>
+							</p>
+							<b>Resources:</b> <a href="https://www.youtube.com/watch?v=Mnaav9QQ49k&t"> Video</a>
+						</p>
+					</div>
+					<div class="col-md-6">
+						<img class="img-thumbnail" src="images/projects/uav_landing.png" width="100%" />
+					</div>
+				</div>
+
+				<hr class="my-4">
+				<div class="row top-buffer even">
+					<div class="col-md-6">
+						<img class="img-thumbnail" src="images/projects/gas_detection.png" width="100%" />
+					</div>
+					<div class="col-md-6">
+						<h2>A Next-Best-Smell Approach for Gas Detection with a Mobile Robot
+						</h2>
+						<p><b>Contribution:</b>
+							<ul>
+							<li> Multi-Criteria decision making    </li>
+							<li> Online planner </li>
+							<li> Scalable to multiple criteria</li>
+							</ul>
+							</p>
+							<b>Resources:</b> <a href="https://youtu.be/AKYRPorY_KI">Video</a>
+						</p>
 					</div>
 				</div>
 			</div>
 		</div>
-
-
 
 		<!-- FOOTER -->
 		<footer>
 			<div class="container">
 				<div class="row text-center">
 					If you are interested in my work, please let me know; I would be very interested to hear of
-					potential collaborations!
+					potential
+					collaborations!
 
 					<ul class="list-inline social-icons">
 
-						<li class="">
+						<li class="icons">
 							<a href="https://facebook.com/pulver22"><i class="fa fa-facebook"></i></a>
 						</li>
 
 
-						<li class="">
+						<li class="icons">
 							<a href="https://github.com/pulver22"><i class="fa fa-github"></i></a>
 						</li>
 
 
-						<li class="">
+						<li class="icons">
 							<a href="mailto:pulver22@gmail.com"><i class="fa fa-envelope"></i></a>
 						</li>
 
-						<li class="">
-							<a href="https://www.dropbox.com/s/e9upikotycolrx2/CV_RiccardoPolvara.pdf?dl=0"> <i
-									class="fa fa-file-o"></i></a>
+						<li class="icons">
+							<a href="https://www.dropbox.com/s/e9upikotycolrx2/CV_RiccardoPolvara.pdf?dl=0"> <i class="fa fa-file-o"></i></a>
 						</li>
 
 					</ul>
@@ -184,22 +254,6 @@
 	<script src="js/jquery.mousewheel.min.js"></script>
 
 	<script src="js/main.js"></script>
-	<script>
-		(function (i, s, o, g, r, a, m) {
-			i['GoogleAnalyticsObject'] = r;
-			i[r] = i[r] || function () {
-				(i[r].q = i[r].q || []).push(arguments)
-			}, i[r].l = 1 * new Date();
-			a = s.createElement(o),
-				m = s.getElementsByTagName(o)[0];
-			a.async = 1;
-			a.src = g;
-			m.parentNode.insertBefore(a, m)
-		})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-		ga('create', 'UA-94119449-1', 'auto');
-		ga('send', 'pageview');
-	</script>
 
 	<script>
 		$(document).ready(function () {
@@ -208,7 +262,7 @@
 	</script>
 
 	<script>
-		$(document).ready(function () {
+		$(document).ready(function() {
 			$('#navigation').load('./reusable_navbar.html');
 		});
 	</script>
