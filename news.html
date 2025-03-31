@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title>riccardopolvara - robotics, artificial intelligence, photography</title>
+	<title>riccardopolvara - publications</title>
 	<meta name="description"
 		content="Hi, I'm Riccardo Polvara, a Postdoctoral researcher with the Lincoln Centre for Autonomous Systems, University of Lincoln. I'm researching path planning and obstacle avoidance.">
 	<meta name="author" content="Riccardo Polvara">
@@ -16,10 +16,15 @@
 	<link href="assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/css/main.css" rel="stylesheet" type="text/css">
 	<link href="css/main.css" rel="stylesheet" type="text/css">
+	<link rel="canonical" href="https://pulver22.github.io/publications/">
+	<link rel="alternate" type="application/atom+xml"
+		title="riccardopolvara - robotics, artificial intelligence, photography"
+		href="https://pulver22.github.io/feed.xml" />
 
-	<link rel="canonical" href="https://pulver22.github.io/">
-	<!-- <link rel="alternate" type="application/atom+xml" -->
-	<!-- title="riccardopolvara - robotics, artificial intelligence, photography" href="https://pulver22.github.io/feed.xml" /> -->
+	<!-- IE 9 Fallback-->
+	<!--[if IE 9]>
+    <link href="/assets/css/ie.css" rel="stylesheet">
+  <![endif]-->
 
 	<!-- GOOGLE FONTS -->
 	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300' rel='stylesheet'
@@ -53,268 +58,215 @@
 	<meta name="msapplication-square310x310logo" content="assets/ico/mstile-310x310.png" />
 	<meta name="application-name" content="riccardopolvara - robotics, artificial intelligence, photography" />
 	<meta name="msapplication-TileColor" content="#ffffff" />
+
+	<!-- <link rel="stylesheet" href="assets/css/bootstrap.min.css" /> -->
+	<style>
+		.news-image {
+			width: 100%;
+			height: auto;
+			border-radius: 0.5rem;
+			border: 1px solid #ddd;
+			padding: 4px;
+			background-color: white;
+		}
+
+		.news-block {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: flex-start;
+			margin-bottom: 4rem;
+		}
+
+		.news-block.reverse {
+			flex-direction: row-reverse;
+		}
+
+		.news-block .text-col,
+		.news-block .img-col {
+			flex: 1 1 50%;
+			max-width: 50%;
+			padding: 1rem;
+		}
+
+		@media (max-width: 768px) {
+
+			.news-block,
+			.news-block.reverse {
+				flex-direction: column !important;
+			}
+
+			.news-block .text-col,
+			.news-block .img-col {
+				max-width: 100%;
+			}
+		}
+	</style>
 </head>
 
 <body>
-	<!-- WRAPPER -->
+		<!-- <h1 class="mb-4">News</h1> -->
 	<div class="wrapper">
-
-
-		<!-- NAVBAR -->
 		<div id="navigation"></div>
+		<main class="container py-5">
+		<p class="text-left section-heading">
+			</br></br>
+			News
+		</p>
 
-		<div class="main-content">
-			<div class="container">
-				<!-- INTRO -->
-				<p class="text-left section-heading">
-					News
-				</p>
-
-				<hr class="my-4">
-				<div class="row top-buffer first even">
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/robocup24.png" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>The LCASTOR team is qualified for RoboCup 2024!</h2>
-						<p>For the second year in a row, our LCASTOR team achieved a successful qualification at the major robot competition. This year, the event will be held in the beautiful city of Eindhoven, Netherlands. We are looking forward to showcasing our latest research. A video about our qualification can be found on <a href="https://www.youtube.com/watch?v=zEL17HMVihI">Youtube</a>.
-						</p>
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-bufrow top-buffer first odd img-rounded">
-					<div class="col-md-6">
-						<h2>Invited talk at Sheffield Hallam University</h2>
-						<p>On the 1st of December 2023, I have been invited to give a talk as part of the <i>Engineering Innovation: Unveiling the Future</i> seminar series, at the Sheffield Hallam University. A recording of my 45-minutes long monologue on mobile autonomy in the field is available on <a href="https://www.youtube.com/watch?v=v16gjCEwYeg&feature=youtu.be">Youtube</a>.
-						</p>
-					</div>
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/sheffield_talk.png" width="100%" />
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer first odd img-rounded">
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/lcas.webp" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>I have been promoted Senior Lecturer</h2>
-						<p>Following a very successful year in teaching and research, culminated with the award of two major research grants, I have been appointed Senior Lecturer at the University of Lincoln. 
-							<br>Keep up doing cool amazing job! 💪🏻</p>
-					</div>
-				</div>
+		<div id="news-container"></div>
 
 
-				<hr class="my-4">
-				<div class="row top-buffer first even">
-					<div class="col-md-6">
-						<h2>The LCASTOR team in Bordeaux!</h2>
-						<p>Our team had a blast at our first appearance at the RoboCup 2023 in Bordeaux! We were able to demonstrate our latest research in autonomous navigation and mapping, people tracking and following, and human language understanding. More information about our experience can be found on the <a href="https://agriforwards-students.blogs.lincoln.ac.uk/2023/08/15/robocup-2023-france/">blog post</a> written by Alex..
-						</p>
-					</div>
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/robocup.jpg" width="100%" />
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer first even">
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/projects/GAIA_overview.png" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>New EPSRC grant: GAIA</h2>
-						<p>There is a growing demand for multi-robot mapping in applications like site inspection and agriculture. As such, there is a need for communication among robots to share information and create a comprehensive view of the environment. Existing methods for integrating maps from multiple robots face challenges, especially with fleets of diverse robots. The GAIA (Ground-Aerial maps Integration for increased Autonomy Outdoors) project aims to tackle these challenges by leveraging human understanding to integrate multi-perspective robotic maps. In agriculture, autonomous robots assist in tasks like monitoring and harvesting, with ground robots providing detailed inspections and UAVs offering wide-area observation. The project focuses on precision agriculture, where robotics can revolutionize practices. UAVs actively sense and update maps, improving efficiency by mapping obstacles and aiding ground platform deployment. Overall, the project aims to enhance autonomy outdoors through integrated mapping solutions. This project is an international collaboration with the <a href="https://www.linkedin.com/in/marija-popovi%C4%87-31237260/">Marija Popovic</a> (UT Delft), <a href="https://www.linkedin.com/in/cyrill-stachniss-736233173/">Cyrill Stachiss</a> (University of Bonn), and <a href="https://www.linkedin.com/in/cesar-cadena-204106b/">Cesar Cadena</a> (ETH Zurich).
-						</p>
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer first odd img-rounded">
-					
-					<div class="col-md-6">
-						<h2>New InnovateUK grant: Vineyard Information System for Technology and Automation</h2>
-						<p>A new project, funded by Defra's Farming Innovation Programme and UKRI's Transforming Food Production Challenge, aims to create an open standard for digital maps of vineyards. The project is called Vineyard Information System for Technology and Automation, or 'VISTA'. The project is led by a consortium of leading industry partners and researchers from various fields.
-						The VISTA map will provide the digital backbone to process data collected by drone, robot and in-field sensors. The data will include information on climate and weather, crop health, soil moisture, fruit counts, and fruit quality. The VISTA map will also enable valuable decision-making support for vineyard production, such as precision spraying and pre-harvest yield estimation. The project will demonstrate the use of the map for these two applications in the second year of the project. The project hopes to show the benefits of a flexible, high resolution mapping standard for farms worldwide and explore more applications in the future.</p>
-					</div>
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/projects/vista_project.png" width="100%" />
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer first even">
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/lecture.jpeg" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>Lecturer in Robotics and Autonomous Systems</h2>
-						<p>From September 2022, I'm happy to share that I'm starting a new position as a Lecturer (Asst. Professor) in Robotics and Autonomous Systems at the University of Lincoln! <br>
-							The past 4 years have been fabulous while being part of the Lincoln Centre for Autonomous Systems (L-CAS), I've learnt a lot while working on cutting-edge technologies. It's such a fantastic place where to work to the point I've decided to remain as a full-time academic!
-							</p>
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer first odd img-rounded">
-					
-					<div class="col-md-6">
-						<h2>New Postdoc position in BACCHUS</h2>
-						<p>Starting from April 2021, I am one of the Postdocs in Lincoln for the H2020 <a href="https://bacchus-project.eu/">BACCHUS</a> project,
-							involving multiple partners across the European continent. My duties involve researching new
-							localization solution for out-door long-term navigation, while comprising spatial and
-							temporal constraints.</p>
-					</div>
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/Thorvald.jpg" width="100%" />
-					</div>
-				</div>
-				
-				<hr class="my-4">
-				<div class="row top-buffer first even">
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/graduation.jpg" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>Finally a PhD</h2>
-						<p>In September 2019, I officially graduated and attended the graduation ceremony at my old
-							institution, the University of Plymouth.</p>
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer first odd img-rounded">
-
-					<div class="col-md-6">
-						<h2>New PostDoc at Lincoln Centre for Autonomous Systems</h2>
-						<p>Following the submission of my PhD dissertation, I moved to Lincoln as new research
-							fellow in
-							the "National Centre for Nuclear Robotics". Academic partners of the projects comprise
-							University of Birmingham, Edinburgh, Bristol, Essex, Lancaster and Queens Mary in
-							London. My
-							objective is developing new navigation and recovery strategies for a mobile robot using
-							deep
-							reinforcement learning.</p>
-					</div>
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/lincoln.jpg" width="100%" />
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer even">
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/marine_uas.jpg" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>MarineUAS winter school in Porto</h2>
-						<p>In January 2018, I spent two weeks in Oulu to improve my knowledge about robotics systems
-							and
-							marine applications. The focus of the event was mainly related to establish international
-							collaboration with research fellows in the same field. In the workshop session, together
-							with my group I implemented a collision-free navigation algorithm for drones in a 3D
-							environment.</p>
-					</div>
-
-				</div>
-
-
-				<hr class="my-4">
-				<div class="row top-buffer odd img-rounded">
-
-					<div class="col-md-6">
-						<h2>Eurathlon/TRADR summer school in Oulu</h2>
-						<p>In the summer of 2016, I spent one week in the beautiful Oulu (Finland) as participant of
-							a
-							summer school focus on heterogeneity in multi-agent systems. Here, I improved my skills
-							in
-							developing software and controlling both ground and aerial unmanned vehicles.</p>
-					</div>
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/tradr.jpg" width="100%" />
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer even">
-
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/plymouth.jpg" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>Secured a PhD position in Plymouth, UK</h2>
-						<p>I am going to live for the next three years in Plymouth, just at the beginning of the
-							beautiful Cornwall. As a PhD student of the Autonomous Marine Systems research group, I
-							will
-							study how to combine a flying drone with an autonomous boat in order to increase the
-							overall awareness of the surrounding environment.</p>
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer odd img-rounded">
-
-					<div class="col-md-6">
-						<h2>MSc in Computer Engineering</h2>
-						<p>In September 2015, after be back from Sweden, I successfully defended my MSc thesis in
-							front
-							of a committee at my university, the Politecnico di Milano. This represents the end of a
-							long but beautiful trip lasted 5 years.</p>
-					</div>
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/msc.jpg" width="100%" />
-					</div>
-				</div>
-
-				<hr class="my-4">
-				<div class="row top-buffer even">
-					<div class="col-md-6">
-						<img class="img-thumbnail" src="images/orebro.jpg" width="100%" />
-					</div>
-					<div class="col-md-6">
-						<h2>Placement at the Mobile Robotics Lab - Orebro Universitet</h2>
-						<p>Between March and July 2015, I moved to Sweden to complete my MSc dissertation. I was
-							guided
-							by Dr. Erik Schaffernicht and Prof. Achim Lilientham (with remote supervision of my
-							Italian
-							advisor, Prof. Francesco Amigoni). I developed an implemented an online navigation
-							algorithm
-							for Gasbot, a mobile robot equipped with a remote gas sensor. The goal of this work was
-							to
-							have efficient navigation strategies to identify all the methane leak sources in a given
-							environment.</p>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- FOOTER -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		const newsItems = [
+			{
+				title: "LCASTOR Team Qualified for RoboCup 2024!",
+				image: "images/robocup24.png",
+				alt: "LCASTOR RoboCup 2024",
+				content:
+					"For the second year in a row, our LCASTOR team has qualified for RoboCup. This year\u2019s event will take place in Eindhoven, Netherlands. We\u2019re excited to present our latest robotics research. <a href='https://www.youtube.com/watch?v=zEL17HMVihI'>Watch the qualification video</a>.",
+			},
+			{
+				title: "Invited Talk at Sheffield Hallam University",
+				image: "images/sheffield_talk.png",
+				alt: "Sheffield Hallam Talk",
+				content:
+					"On 1st December 2023, I gave a talk as part of the <i>Engineering Innovation: Unveiling the Future</i> seminar series. The recording is available on <a href='https://www.youtube.com/watch?v=v16gjCEwYeg'>YouTube</a>.",
+			},
+			{
+				title: "Promoted to Senior Lecturer",
+				image: "images/lcas.webp",
+				alt: "Promotion Announcement",
+				content:
+					"Following a successful year in teaching and research, including two major grant awards, I have been appointed Senior Lecturer at the University of Lincoln.",
+			},
+			{
+				title: "LCASTOR at RoboCup 2023 in Bordeaux",
+				image: "images/robocup.jpg",
+				alt: "RoboCup Bordeaux",
+				content:
+					"We had a great time presenting our research at RoboCup 2023. Read more in <a href='https://agriforwards-students.blogs.lincoln.ac.uk/2023/08/15/robocup-2023-france/'>this blog post</a> by Alex.",
+			},
+			{
+				title: "New EPSRC Grant: GAIA",
+				image: "images/projects/GAIA_overview.png",
+				alt: "GAIA Project Overview",
+				content:
+					"GAIA (Ground-Aerial maps Integration for increased Autonomy Outdoors) focuses on multi-robot mapping for agriculture. It is a collaboration with TU Delft, University of Bonn, and ETH Zurich.",
+			},
+			{
+				title: "New InnovateUK Grant: VISTA",
+				image: "images/projects/vista_project.png",
+				alt: "VISTA Project",
+				content:
+					"VISTA is developing open standards for vineyard mapping using drones, robots, and in-field sensors, supporting decision-making for precision agriculture.",
+			},
+			{
+				title: "Lecturer in Robotics and Autonomous Systems",
+				image: "images/lecture.jpeg",
+				alt: "Lecturer Appointment",
+				content:
+					"From September 2022, I started a new position as Lecturer in Robotics and Autonomous Systems at the University of Lincoln, following 4 great years as a Postdoc at LCAS.",
+			},
+			{
+				title: "New Postdoc position in BACCHUS",
+				image: "images/Thorvald.jpg",
+				alt: "BACCHUS Postdoc",
+				content:
+					"Since April 2021, I\u2019ve been a Postdoc in the EU H2020 <a href='https://bacchus-project.eu/'>BACCHUS</a> project, researching outdoor long-term localisation and navigation for mobile robots.",
+			},
+			{
+				title: "Graduated with a PhD",
+				image: "images/graduation.jpg",
+				alt: "PhD Graduation",
+				content:
+					"In September 2019, I officially received my PhD from the University of Plymouth in autonomous marine systems.",
+			},
+			{
+				title: "PostDoc at Lincoln Centre for Autonomous Systems",
+				image: "images/lincoln.jpg",
+				alt: "PostDoc at LCAS",
+				content:
+					"After my PhD, I joined the National Centre for Nuclear Robotics, working on deep reinforcement learning for mobile robot navigation and recovery.",
+			},
+			{
+				title: "MarineUAS Winter School in Porto",
+				image: "images/marine_uas.jpg",
+				alt: "MarineUAS Winter School",
+				content:
+					"In January 2018, I joined the MarineUAS winter school to explore collaborative robotics in marine environments and developed 3D navigation algorithms for drones.",
+			},
+			{
+				title: "Eurathlon/TRADR Summer School in Oulu",
+				image: "images/tradr.jpg",
+				alt: "TRADR Summer School",
+				content:
+					"In summer 2016, I attended a robotics summer school in Oulu (Finland), focusing on heterogeneous multi-agent systems for real-world missions.",
+			},
+			{
+				title: "PhD in Plymouth, UK",
+				image: "images/plymouth.jpg",
+				alt: "PhD Start",
+				content:
+					"I started my PhD in 2015 in the Autonomous Marine Systems group, studying aerial-ground cooperation using drones and unmanned boats.",
+			},
+			{
+				title: "MSc in Computer Engineering",
+				image: "images/msc.jpg",
+				alt: "MSc Defence",
+				content:
+					"In 2015, I completed my MSc in Computer Engineering at Politecnico di Milano, after defending my thesis based on work done in Sweden.",
+			},
+			{
+				title: "Thesis Placement at \u00d6rebro University",
+				image: "images/orebro.jpg",
+				alt: "Orebro Research",
+				content:
+					"In 2015, I worked on my MSc thesis at \u00d6rebro University, developing navigation strategies for a mobile gas-sensing robot.",
+			},
+		];
+		$(function () {
+			newsItems.forEach((item, index) => {
+				const reverseClass = index % 2 !== 0 ? "reverse" : "";
+				$("#news-container").append(`
+          <div class="news-block ${reverseClass}">
+            <div class="img-col">
+              <img src="${item.image}" class="news-image" alt="${item.alt}">
+            </div>
+            <div class="text-col">
+              <h2>${item.title}</h2>
+              <p>${item.content}</p>
+            </div>
+          </div>
+		  ${index < newsItems.length - 1 ? '<hr class="my-4">' : ''}
+        `);
+			});
+		});
+	</script>
+	</main>
 		<footer>
 			<div class="container">
 				<div class="row text-center">
 					If you are interested in my work, please let me know; I would be very interested to hear of
-					potential
-					collaborations!
+					potential collaborations!
 
 					<ul class="list-inline social-icons">
 
-						<li class="icons">
-							<a href="https://facebook.com/pulver22"><i class="fa fa-facebook"></i></a>
+						<li class="">
+							<a href="https://facebook.com/pulver22"><i class="social-icon fa fa-facebook"></i></a>
 						</li>
 
 
-						<li class="icons">
+						<li class="">
 							<a href="https://github.com/pulver22"><i class="fa fa-github"></i></a>
 						</li>
 
 
-						<li class="icons">
+						<li class="">
 							<a href="mailto:pulver22@gmail.com"><i class="fa fa-envelope"></i></a>
 						</li>
 
-						<li class="icons">
+						<li class="">
 							<a href="https://www.dropbox.com/s/e9upikotycolrx2/CV_RiccardoPolvara.pdf?dl=0"> <i class="fa fa-file-o"></i></a>
 						</li>
 
@@ -322,45 +274,13 @@
 				</div>
 			</div>
 		</footer>
-		<!-- END FOOTER -->
 	</div>
-	<!-- END WRAPPER -->
-
-	<!-- for lateral navbar-->
-	<script src="assets/js/jquery-2.1.1.min.js"></script>
-	<script src="assets/js/bootstrap.min.js"></script>
-	<script src="js/jquery-3.3.1.min.js"></script>
-	<script src="js/jquery-migrate-3.0.1.min.js"></script>
-	<script src="js/jquery-ui.js"></script>
-	<script src="js/popper.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/owl.carousel.min.js"></script>
-	<script src="js/jquery.stellar.min.js"></script>
-	<script src="js/jquery.countdown.min.js"></script>
-	<script src="js/jquery.magnific-popup.min.js"></script>
-	<script src="js/bootstrap-datepicker.min.js"></script>
-	<script src="js/swiper.min.js"></script>
-	<script src="js/aos.js"></script>
-
-	<script src="js/picturefill.min.js"></script>
-	<script src="js/lightgallery-all.min.js"></script>
-	<script src="js/jquery.mousewheel.min.js"></script>
-
-	<script src="js/main.js"></script>
-
+	
 	<script>
 		$(document).ready(function () {
-			$('#dropdown_photos_menu').load('./reusable_dropdown_photo_menu.html');
-		});
-	</script>
-
-	<script>
-		$(document).ready(function() {
 			$('#navigation').load('./reusable_navbar.html');
 		});
 	</script>
-
 </body>
-
 
 </html>
