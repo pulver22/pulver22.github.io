@@ -83,73 +83,7 @@
         </div>
 
         <div class="gallery " id="lightgallery">
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/0.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/0.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/1.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/1.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/2.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/2.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/3.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/3.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/4.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/4.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/5.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/5.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/6.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/6.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/7.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/7.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/8.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/8.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/9.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/9.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/10.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/10.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/11.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/11.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/12.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/12.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/13.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/13.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/14.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/14.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/15.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/15.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
-          <div class="md-3 imageuh " data-src="../images/photos/paris/big/16.jpg" data-sub-html="">
-            <a href="#"><img src="../images/photos/paris/small/16.jpg" alt="" class="img-fluid img-responsive"></a>
-          </div>
-
+          <p id="loading-message" class="text-center">Loading images...</p>
         </div>
       </div>
     </div>
@@ -193,34 +127,23 @@
   </div>
 
   <!-- for lateral navbar-->
-  <script src="../assets/js/jquery-2.1.1.min.js"></script>
-  <script src="../assets/js/bootstrap.min.js"></script>
-
   <script src="../js/jquery-3.3.1.min.js"></script>
   <script src="../js/jquery-migrate-3.0.1.min.js"></script>
   <script src="../js/jquery-ui.js"></script>
   <script src="../js/popper.min.js"></script>
   <script src="../js/bootstrap.min.js"></script>
-  <script src="../js/owl.carousel.min.js"></script>
-  <script src="../js/jquery.stellar.min.js"></script>
-  <script src="../js/jquery.countdown.min.js"></script>
   <script src="../js/jquery.magnific-popup.min.js"></script>
-  <script src="../js/bootstrap-datepicker.min.js"></script>
-  <script src="../js/swiper.min.js"></script>
-  <script src="../js/aos.js"></script>
-
-  <script src="../js/picturefill.min.js"></script>
   <script src="../js/lightgallery-all.min.js"></script>
-  <script src="../js/jquery.mousewheel.min.js"></script>
-
+  <script src="../js/aos.js"></script>
+  <script src="../js/dynamic-gallery.js"></script>
   <script src="../js/main.js"></script>
 
   <script>
-    $(document).ready(function () {
-      $('#lightgallery').lightGallery({
-        selector: '.imageuh '
-      });
-    });
+    initializeDynamicGallery(
+      '#lightgallery',
+      'https://riccardopictures.zrok.lcas.group/Paris/',
+      'Paris'
+    );
   </script>
 
   <script>
@@ -228,7 +151,6 @@
       $('#navigation').load('../reusable_navbar.html');
     });
   </script>
-
 
   </div>
   <!-- END WRAPPER -->
