@@ -138,15 +138,17 @@
   <script src="../js/lightgallery-all.min.js" defer></script>
   <script src="../js/jquery.magnific-popup.min.js" defer></script>
   <script src="../js/aos.js" defer></script>
-  <script src="../js/dynamic-gallery.js" defer></script>
-  <script src="../js/main.js" defer></script>
+  <script src="../js/dynamic-gallery.js"></script>
+  <script src="../js/main.js"></script>
 
   <script>
-    initializeDynamicGallery(
-      '#lightgallery',
-      'https://riccardopictures.zrok.lcas.group/DonnaNook/',
-      'Donna Nook'
-    );
+    $(document).ready(function() {
+      initializeDynamicGallery(
+        '#lightgallery',
+        'https://riccardopictures.zrok.lcas.group/DonnaNook/',
+        'Donna Nook'
+      );
+    });
   </script>
 
   <script>
