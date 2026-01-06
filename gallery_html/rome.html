@@ -129,30 +129,31 @@
   <!-- for lateral navbar-->
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHMnYvLApEYASNNiN7tQKcQ1TSjw=" crossorigin="anonymous"></script>
 	<script src="../assets/js/bootstrap.min.js"></script>
-  <script src="../js/jquery-ui.js"></script>
-  <script src="../js/popper.min.js"></script>
-  <script src="../js/bootstrap.min.js"></script>
-  <script src="../js/owl.carousel.min.js"></script>
-  <script src="../js/jquery.stellar.min.js"></script>
-  <script src="../js/jquery.countdown.min.js"></script>
-  <script src="../js/jquery.magnific-popup.min.js"></script>
-  <script src="../js/bootstrap-datepicker.min.js"></script>
-  <script src="../js/swiper.min.js"></script>
-  <script src="../js/aos.js"></script>
+  <script src="../js/jquery-ui.js" defer></script>
+  <script src="../js/popper.min.js" defer></script>
+  <script src="../js/owl.carousel.min.js" defer></script>
+  <script src="../js/jquery.stellar.min.js" defer></script>
+  <script src="../js/jquery.countdown.min.js" defer></script>
+  <script src="../js/jquery.magnific-popup.min.js" defer></script>
+  <script src="../js/bootstrap-datepicker.min.js" defer></script>
+  <script src="../js/swiper.min.js" defer></script>
+  <script src="../js/aos.js" defer></script>
 
-  <script src="../js/picturefill.min.js"></script>
-  <script src="../js/lightgallery-all.min.js"></script>
-  <script src="../js/jquery.mousewheel.min.js"></script>
+  <script src="../js/picturefill.min.js" defer></script>
+  <script src="../js/lightgallery-all.min.js" defer></script>
+  <script src="../js/jquery.mousewheel.min.js" defer></script>
   <script src="../js/dynamic-gallery.js"></script>
 
   <script src="../js/main.js"></script>
 
   <script>
-    initializeDynamicGallery(
+    $(document).ready(function() {
+      initializeDynamicGallery(
       '#lightgallery',
       'https://riccardopictures.zrok.lcas.group/Rome/',
       'Rome'
     );
+    });
   </script>
 
   <script>
