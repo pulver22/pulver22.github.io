@@ -132,15 +132,17 @@
   <script src="../js/owl.carousel.min.js"></script>
   <script src="../js/lightgallery-all.min.js" defer></script>
   <script src="../js/aos.js" defer></script>
-  <script src="../js/dynamic-gallery.js" defer></script>
+  <script src="../js/dynamic-gallery.js"></script>
   <script src="../js/main.js" defer></script>
 
   <script>
-    initializeDynamicGallery(
-      '#lightgallery',
-      'https://riccardopictures.zrok.lcas.group/Porto/',
-      'Porto'
-    );
+    $(document).ready(function() {
+      initializeDynamicGallery(
+        '#lightgallery',
+        'https://riccardopictures.zrok.lcas.group/Porto/',
+        'Porto'
+      );
+    });
   </script>
 
   <script>
