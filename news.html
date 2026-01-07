@@ -5,6 +5,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <title>riccardopolvara - publications</title>
     <meta name="description"
@@ -310,7 +315,7 @@
         $("#news-container").append(`
         <div class="news-block ${reverseClass}">
           <div class="img-col">
-            <img src="${item.image}" class="news-image" alt="${item.alt}">
+            <img src="${item.image}" class="news-image" alt="${item.alt}" loading="lazy">
           </div>
           <div class="text-col">
             <h2>${item.title}</h2>

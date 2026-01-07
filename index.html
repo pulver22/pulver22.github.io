@@ -5,11 +5,22 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<!-- Security Headers -->
+	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+	<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+	<meta name="referrer" content="strict-origin-when-cross-origin">
 
 	<title>riccardopolvara - robotics, artificial intelligence, photography</title>
 	<meta name="description"
 		content="Hi, I'm Riccardo Polvara, a Postdoctoral researcher with the Lincoln Centre for Autonomous Systems, University of Lincoln. I'm researching path planning and obstacle avoidance.">
 	<meta name="author" content="Riccardo Polvara">
+
+	<!-- Performance: Resource Hints -->
+	<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+	<link rel="dns-prefetch" href="https://www.google-analytics.com">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 	<!-- CSS -->
 	<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
@@ -85,7 +96,7 @@
 							  
 					</div>
 					<div class="col-md-3">
-						<img src="assets/img/RP_portrait.jpg" class="img-responsive img-circle">
+						<img src="assets/img/RP_portrait.jpg" class="img-responsive img-circle" alt="Riccardo Polvara portrait" loading="lazy" width="300" height="300">
 					</div>
 				</div>
 			</div>
@@ -130,13 +141,11 @@
 	<!-- END WRAPPER -->
 
 	<!-- for lateral navbar-->
-	<script src="assets/js/jquery-2.1.1.min.js"></script>
-	<script src="assets/js/bootstrap.min.js"></script>
 	<script src="js/jquery-3.3.1.min.js"></script>
 	<script src="js/jquery-migrate-3.0.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
 	<script src="js/jquery-ui.js" defer></script>
 	<script src="js/popper.min.js" defer></script>
-	<script src="js/bootstrap.min.js"></script>
 	<script src="js/owl.carousel.min.js" defer></script>
 	<script src="js/jquery.stellar.min.js" defer></script>
 	<script src="js/jquery.countdown.min.js" defer></script>
@@ -161,7 +170,7 @@
 			a.async = 1;
 			a.src = g;
 			m.parentNode.insertBefore(a, m)
-		})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+		})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
 		ga('create', 'UA-94119449-1', 'auto');
 		ga('send', 'pageview');
