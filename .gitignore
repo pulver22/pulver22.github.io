@@ -1,2 +1,11 @@
 
 .vscode/
+.DS_Store
+node_modules/
+*.log
+.env
+.cache/
+dist/
+build/
+*.tmp
+*.temp
