@@ -5,11 +5,22 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<!-- Security Headers -->
+	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+	<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+	<meta name="referrer" content="strict-origin-when-cross-origin">
 
 	<title>riccardopolvara - publications</title>
 	<meta name="description"
 		content="Hi, I'm Riccardo Polvara, a Postdoctoral researcher with the Lincoln Centre for Autonomous Systems, University of Lincoln. I'm researching path planning and obstacle avoidance.">
 	<meta name="author" content="Riccardo Polvara">
+
+	<!-- Performance: Resource Hints -->
+	<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+	<link rel="dns-prefetch" href="https://www.google-analytics.com">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 	<!-- CSS -->
 	<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
@@ -27,12 +38,7 @@
   <![endif]-->
 
 	<!-- GOOGLE FONTS -->
-	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:600,400,200,300&display=swap' rel='stylesheet'
-		type='text/css'>
-	<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400italic,400,600,700&display=swap' rel='stylesheet'
-		type='text/css'>
-	<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400italic,700,400,300&display=swap'
-		rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600&family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap' rel='stylesheet' type='text/css'>
 
 	<!-- FAVICONS -->
 	<link rel="shortcut icon" href="assets/ico/favicon.ico?v=2" />
@@ -354,7 +360,7 @@
 			a.async = 1;
 			a.src = g;
 			m.parentNode.insertBefore(a, m)
-		})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+		})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
 		ga('create', 'UA-94119449-1', 'auto');
 		ga('send', 'pageview');
