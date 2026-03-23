@@ -246,7 +246,6 @@ hr { border-color: var(--border); }
 
 /* ── Publications ────────────────────────────────────────── */
 .pub-filter-bar {
-  margin-bottom: 2rem;
   display: flex;
   flex-wrap: wrap;
   gap: .5rem;
@@ -265,6 +264,30 @@ hr { border-color: var(--border); }
   background: var(--navy);
   color: #fff;
   border-color: var(--navy);
+}
+
+#refresh-publications {
+  border-radius: 2rem;
+  font-size: .85rem;
+  padding: .35rem 1rem;
+  border: 1.5px solid var(--border);
+  color: var(--gray-text);
+  background: #fff;
+  transition: background .15s, color .15s, border-color .15s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#refresh-publications:hover:not(:disabled) {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+#refresh-publications:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+#refresh-publications i {
+  margin-right: 0.3rem;
 }
 
 .pub-list {

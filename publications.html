@@ -47,13 +47,37 @@
   <main class="section-white">
     <div class="container">
 
-      <!-- Filter buttons -->
-      <div class="pub-filter-bar" id="pub-filters">
-        <button class="btn active" data-filter="all">All</button>
-        <button class="btn" data-filter="journal">Journal Papers</button>
-        <button class="btn" data-filter="conference">Conference Papers</button>
-        <button class="btn" data-filter="other">Presentations &amp; Preprints</button>
+      <!-- Control bar with filters and refresh button -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Filter buttons -->
+        <div class="pub-filter-bar" id="pub-filters">
+          <button class="btn active" data-filter="all">All</button>
+          <button class="btn" data-filter="journal">Journal Papers</button>
+          <button class="btn" data-filter="conference">Conference Papers</button>
+          <button class="btn" data-filter="other">Presentations &amp; Preprints</button>
+        </div>
+
+        <!-- Refresh button -->
+        <button id="refresh-publications" class="btn btn-sm btn-outline-secondary" title="Refresh publications from ORCID/arXiv">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
       </div>
+
+      <!-- Loading indicator -->
+      <div id="publications-loading" class="text-center py-5" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading publications...</span>
+        </div>
+        <p class="mt-3 text-muted">Fetching publications from ORCID and arXiv...</p>
+      </div>
+
+      <!-- Error message -->
+      <div id="publications-error" class="alert alert-warning" style="display: none;" role="alert">
+        <strong>Note:</strong> Unable to fetch latest publications. Showing cached or fallback content.
+      </div>
+
+      <!-- Dynamic publications container -->
+      <div id="publications-container">
 
       <!-- ── Journal Papers ──────────────────────────────── -->
       <h3 class="pub-section-heading" data-section="journal">Journal Papers</h3>
@@ -534,6 +558,8 @@
 
       </ul>
 
+      </div><!-- End publications-container -->
+
     </div>
   </main>
 
@@ -560,26 +586,112 @@
     ga("create","UA-94119449-1","auto");ga("send","pageview");
   </script>
 
-  <!-- Publication filter -->
+  <!-- Publications Manager -->
+  <script src="js/publications.js"></script>
+
+  <!-- Publication filter and initialization -->
   <script>
-    document.querySelectorAll("#pub-filters .btn").forEach(function(btn) {
-      btn.addEventListener("click", function() {
-        document.querySelectorAll("#pub-filters .btn").forEach(function(b){ b.classList.remove("active"); });
-        this.classList.add("active");
-        var filter = this.dataset.filter;
-        document.querySelectorAll(".pub-item").forEach(function(item) {
-          item.style.display = (filter === "all" || item.dataset.type === filter) ? "" : "none";
-        });
-        document.querySelectorAll(".pub-section-heading").forEach(function(heading) {
-          var section = heading.dataset.section;
-          if (filter === "all" || filter === section) {
-            heading.style.display = "";
-          } else {
-            heading.style.display = "none";
-          }
+    // Initialize publications manager
+    let pubManager = null;
+    let useDynamicLoading = true; // Set to false to use static HTML only
+
+    // Filter functionality
+    function setupFilters() {
+      document.querySelectorAll("#pub-filters .btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          document.querySelectorAll("#pub-filters .btn").forEach(function(b){ b.classList.remove("active"); });
+          this.classList.add("active");
+          var filter = this.dataset.filter;
+          document.querySelectorAll(".pub-item").forEach(function(item) {
+            item.style.display = (filter === "all" || item.dataset.type === filter) ? "" : "none";
+          });
+          document.querySelectorAll(".pub-section-heading").forEach(function(heading) {
+            var section = heading.dataset.section;
+            if (filter === "all" || filter === section) {
+              heading.style.display = "";
+            } else {
+              heading.style.display = "none";
+            }
+          });
         });
       });
+    }
+
+    // Load publications dynamically
+    async function loadPublications(forceRefresh = false) {
+      const loadingEl = document.getElementById('publications-loading');
+      const errorEl = document.getElementById('publications-error');
+      const containerEl = document.getElementById('publications-container');
+
+      try {
+        // Show loading state
+        loadingEl.style.display = 'block';
+        errorEl.style.display = 'none';
+
+        // Initialize manager if needed
+        if (!pubManager) {
+          pubManager = new PublicationsManager({
+            orcidId: '0000-0001-8318-7269',
+            authorName: 'Polvara',
+            cacheExpiration: 24 * 60 * 60 * 1000 // 24 hours
+          });
+        }
+
+        // Clear cache if force refresh
+        if (forceRefresh) {
+          pubManager.clearCache();
+        }
+
+        // Fetch publications
+        const publications = await pubManager.fetchPublications();
+
+        // Render publications
+        pubManager.renderPublications(publications, containerEl);
+
+        // Hide loading state
+        loadingEl.style.display = 'none';
+
+        // Setup filters
+        setupFilters();
+
+        console.log(`Successfully loaded ${publications.length} publications`);
+      } catch (error) {
+        console.error('Failed to load publications:', error);
+
+        // Hide loading state
+        loadingEl.style.display = 'none';
+
+        // Show error message (but keep fallback content)
+        errorEl.style.display = 'block';
+
+        // Make sure filters still work with fallback content
+        setupFilters();
+      }
+    }
+
+    // Refresh button handler
+    document.getElementById('refresh-publications').addEventListener('click', function() {
+      const btn = this;
+      const icon = btn.querySelector('i');
+
+      // Add spinning animation
+      icon.classList.add('fa-spin');
+      btn.disabled = true;
+
+      loadPublications(true).finally(() => {
+        icon.classList.remove('fa-spin');
+        btn.disabled = false;
+      });
     });
+
+    // Initialize on page load
+    if (useDynamicLoading) {
+      // Try to load dynamically, but fallback to static content on error
+      loadPublications();
+    } else {
+      // Use static content only
+      setupFilters();
+    }
   </script>
 
   <script>
