@@ -155,19 +155,20 @@ class PublicationsManager {
 
   /**
    * Ensure all publications have author information for display consistency
+   * This is a last resort fallback - should only trigger if ORCID and Crossref both fail
    */
   ensureAuthorConsistency(publications) {
     const targetAuthor = this.config.authorName || 'Polvara';
 
     publications.forEach(pub => {
-      // If no authors at all, add a placeholder with target author
+      // If no authors at all, add a placeholder with target author as absolute last resort
       if (!pub.authors ||
           (Array.isArray(pub.authors) && pub.authors.length === 0) ||
           (typeof pub.authors === 'string' && pub.authors.trim() === '')) {
 
         // Use a generic author entry based on ORCID profile
         pub.authors = [targetAuthor + ' R'];
-        console.warn(`No authors found for "${pub.title}", using placeholder`);
+        console.warn(`No authors found for "${pub.title}" from any source (ORCID or Crossref), using placeholder. DOI: ${pub.doi || 'none'}`);
       }
     });
   }
@@ -266,14 +267,20 @@ class PublicationsManager {
    */
   async enrichWithCrossref(publications) {
     const crossrefPromises = publications
-      .filter(pub => pub.doi && (!pub.authors || pub.authors.length === 0 || !pub.venue))
+      .filter(pub => pub.doi) // Try to enrich all publications with DOIs
       .map(async pub => {
         try {
           const crossrefData = await this.fetchFromCrossref(pub.doi);
           if (crossrefData) {
-            // Add authors if not already present or empty
-            if ((!pub.authors || (Array.isArray(pub.authors) && pub.authors.length === 0)) && crossrefData.authors) {
-              pub.authors = crossrefData.authors;
+            // Add or replace authors if Crossref has better data
+            if (crossrefData.authors && crossrefData.authors.length > 0) {
+              // If we have no authors or just a placeholder, use Crossref
+              if (!pub.authors ||
+                  (Array.isArray(pub.authors) && pub.authors.length === 0) ||
+                  (Array.isArray(pub.authors) && pub.authors.length === 1 && pub.authors[0].includes('Polvara R'))) {
+                pub.authors = crossrefData.authors;
+                console.log(`Enriched "${pub.title}" with ${crossrefData.authors.length} authors from Crossref`);
+              }
             }
             // Add venue if not already present
             if (!pub.venue && crossrefData.venue) {
@@ -361,21 +368,34 @@ class PublicationsManager {
    */
   extractORCIDUrl(work) {
     let url = null;
+    let directUrl = null;
 
-    // Try to get URL from external identifiers
+    // Try to get URL from external identifiers (direct publisher links)
     if (work['external-ids'] && work['external-ids']['external-id']) {
       const urlEntry = work['external-ids']['external-id'].find(
         id => id['external-id-url'] && id['external-id-url'].value
       );
       if (urlEntry) {
-        url = urlEntry['external-id-url'].value;
+        directUrl = urlEntry['external-id-url'].value;
+
+        // Clean trailing slashes from direct URLs
+        if (directUrl && directUrl.endsWith('/')) {
+          directUrl = directUrl.slice(0, -1);
+        }
+
+        // Prefer direct URLs that are NOT doi.org links
+        if (directUrl && !directUrl.includes('doi.org')) {
+          url = directUrl;
+        }
       }
     }
 
-    // Try DOI
+    // If no direct publisher URL, try DOI (but avoid it if possible due to redirect issues)
     if (!url) {
       const doi = this.extractDOI(work);
       if (doi) {
+        // Only use DOI if we have no other option
+        // DOI redirects can sometimes add trailing slashes causing issues
         url = `https://doi.org/${doi}`;
       }
     }
@@ -383,11 +403,14 @@ class PublicationsManager {
     // Fallback to work URL
     if (!url) {
       url = work.url?.value || null;
+      if (url && url.endsWith('/')) {
+        url = url.slice(0, -1);
+      }
     }
 
-    // Clean trailing slashes from URLs to avoid broken links
-    if (url && url.endsWith('/')) {
-      url = url.slice(0, -1);
+    // If we only have directUrl with doi.org, use it as last resort
+    if (!url && directUrl) {
+      url = directUrl;
     }
 
     return url;
