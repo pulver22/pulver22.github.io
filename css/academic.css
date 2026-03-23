@@ -495,3 +495,68 @@ footer.site-footer a:hover { color: #fff; }
   color: #000;
   text-decoration: none;
 }
+
+/* Swiper navigation arrows (Font Awesome 6 chevrons) */
+.images-carousel .swiper-button-prev,
+.images-carousel .swiper-button-next {
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, .55);
+  border-radius: 50%;
+  top: 50%;
+  margin-top: -22px;
+}
+
+.images-carousel .swiper-button-prev::before,
+.images-carousel .swiper-button-next::before {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 1rem;
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.images-carousel .swiper-button-prev::before { content: "\f053"; /* fa-chevron-left  */ }
+.images-carousel .swiper-button-next::before { content: "\f054"; /* fa-chevron-right */ }
+
+/* Swiper pagination bullets */
+.swiper-pagination-bullet {
+  background: rgba(255, 255, 255, .6);
+  opacity: 1;
+}
+.swiper-pagination-bullet-active {
+  background: #fff;
+}
+
+/* ── Individual gallery pages – mosaic layout ────────────── */
+.gallery {
+  column-count: 4;
+  column-gap: .75rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 992px) { .gallery { column-count: 3; } }
+@media (max-width: 600px) { .gallery { column-count: 2; } }
+@media (max-width: 400px) { .gallery { column-count: 1; } }
+
+.imageuh {
+  break-inside: avoid;
+  margin-bottom: .75rem;
+  display: block;
+}
+
+.imageuh a { display: block; }
+
+.imageuh img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity .2s;
+}
+
+.imageuh img:hover { opacity: .88; }
