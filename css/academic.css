@@ -440,11 +440,16 @@ footer.site-footer a:hover { color: #fff; }
   flex-direction: column;
 }
 
-/* Carousel fills all space between navbar and footer */
+/* Nav and footer keep their natural height; carousel fills the rest */
+.photos-page #navigation,
+.photos-page footer.site-footer {
+  flex-shrink: 0;
+}
+
 .photos-page .images-carousel.swiper-container {
-  flex: 1 1 0;
+  flex: 1;
   min-height: 0;
-  height: 0; /* flex-grow overrides this – reliable cross-browser pattern */
+  height: auto; /* let flex determine height so Swiper reads a real value */
 }
 
 .images-carousel.swiper-container {
