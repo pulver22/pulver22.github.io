@@ -449,6 +449,7 @@ footer.site-footer a:hover { color: #fff; }
 .photos-page .images-carousel.swiper-container {
   flex: 1;
   min-height: 0;
+  width: 100%; /* explicit cross-axis width prevents Swiper wrapper width from feeding back */
   height: auto; /* let flex determine height so Swiper reads a real value */
 }
 
