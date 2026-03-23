@@ -147,7 +147,29 @@ class PublicationsManager {
     // Enrich with Crossref data for publications with DOIs
     await this.enrichWithCrossref(publications);
 
+    // Ensure all publications have author information for consistency
+    this.ensureAuthorConsistency(publications);
+
     return publications;
+  }
+
+  /**
+   * Ensure all publications have author information for display consistency
+   */
+  ensureAuthorConsistency(publications) {
+    const targetAuthor = this.config.authorName || 'Polvara';
+
+    publications.forEach(pub => {
+      // If no authors at all, add a placeholder with target author
+      if (!pub.authors ||
+          (Array.isArray(pub.authors) && pub.authors.length === 0) ||
+          (typeof pub.authors === 'string' && pub.authors.trim() === '')) {
+
+        // Use a generic author entry based on ORCID profile
+        pub.authors = [targetAuthor + ' R'];
+        console.warn(`No authors found for "${pub.title}", using placeholder`);
+      }
+    });
   }
 
   /**
@@ -187,11 +209,34 @@ class PublicationsManager {
     const authors = contributors
       .filter(c => c['contributor-attributes']?.['contributor-role'] === 'author')
       .map(c => {
+        // Try credit name first
         const creditName = c['credit-name']?.value;
         if (creditName) {
           return creditName;
         }
-        // Fallback to name parts if credit-name not available
+
+        // Try to construct from contributor-orcid or contributor-email if available
+        // Try alternative paths for given and family names
+        const attrs = c['contributor-attributes'];
+        let givenName = attrs?.['given-names']?.value;
+        let familyName = attrs?.['family-name']?.value;
+
+        // Sometimes names are at the contributor level
+        if (!givenName && c['contributor-orcid']) {
+          givenName = c['contributor-orcid']['given-names']?.value;
+        }
+        if (!familyName && c['contributor-orcid']) {
+          familyName = c['contributor-orcid']['family-name']?.value;
+        }
+
+        if (givenName && familyName) {
+          return `${givenName} ${familyName}`;
+        } else if (familyName) {
+          return familyName;
+        } else if (givenName) {
+          return givenName;
+        }
+
         return null;
       })
       .filter(name => name !== null);
@@ -221,13 +266,13 @@ class PublicationsManager {
    */
   async enrichWithCrossref(publications) {
     const crossrefPromises = publications
-      .filter(pub => pub.doi)
+      .filter(pub => pub.doi && (!pub.authors || pub.authors.length === 0 || !pub.venue))
       .map(async pub => {
         try {
           const crossrefData = await this.fetchFromCrossref(pub.doi);
           if (crossrefData) {
-            // Add authors if not already present
-            if (!pub.authors && crossrefData.authors) {
+            // Add authors if not already present or empty
+            if ((!pub.authors || (Array.isArray(pub.authors) && pub.authors.length === 0)) && crossrefData.authors) {
               pub.authors = crossrefData.authors;
             }
             // Add venue if not already present
@@ -315,23 +360,37 @@ class PublicationsManager {
    * Extract URL from ORCID work
    */
   extractORCIDUrl(work) {
+    let url = null;
+
     // Try to get URL from external identifiers
     if (work['external-ids'] && work['external-ids']['external-id']) {
       const urlEntry = work['external-ids']['external-id'].find(
         id => id['external-id-url'] && id['external-id-url'].value
       );
       if (urlEntry) {
-        return urlEntry['external-id-url'].value;
+        url = urlEntry['external-id-url'].value;
       }
     }
 
     // Try DOI
-    const doi = this.extractDOI(work);
-    if (doi) {
-      return `https://doi.org/${doi}`;
+    if (!url) {
+      const doi = this.extractDOI(work);
+      if (doi) {
+        url = `https://doi.org/${doi}`;
+      }
     }
 
-    return work.url?.value || null;
+    // Fallback to work URL
+    if (!url) {
+      url = work.url?.value || null;
+    }
+
+    // Clean trailing slashes from URLs to avoid broken links
+    if (url && url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+
+    return url;
   }
 
   /**
