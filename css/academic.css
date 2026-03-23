@@ -84,14 +84,12 @@ hr { border-color: var(--border); }
 .hero-section {
   background: var(--gray-bg);
   padding: 5rem 0 4rem;
-  margin-top: 56px; /* navbar height */
 }
 
 .page-hero-sm {
   background: var(--navy);
   color: #fff;
   padding: 3rem 0 2.5rem;
-  margin-top: 56px;
 }
 .page-hero-sm h1 { color: #fff; margin-bottom: .25rem; }
 .page-hero-sm p  { color: rgba(255,255,255,.8); margin-bottom: 0; }
@@ -433,3 +431,67 @@ footer.site-footer a:hover { color: #fff; }
 .text-navy { color: var(--navy) !important; }
 .bg-navy   { background: var(--navy) !important; }
 .mt-navbar { margin-top: 56px; }
+
+/* ── Photos page – full-viewport swiper carousel ─────────── */
+.images-carousel.swiper-container {
+  height: calc(100vh - 56px);
+}
+
+.images-carousel .swiper-slide .image-wrap {
+  display: block;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.images-carousel .swiper-slide .image-wrap::before {
+  position: absolute;
+  content: "";
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  transition: background .3s ease;
+}
+
+.images-carousel .swiper-slide .image-wrap:hover::before {
+  background: rgba(0, 0, 0, .4);
+}
+
+.images-carousel .swiper-slide .image-wrap img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.images-carousel .swiper-slide .image-info {
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+}
+
+.images-carousel .swiper-slide .image-info h2 { color: #fff; }
+
+.images-carousel .btn-outline-white {
+  border: 2px solid #fff;
+  color: #fff;
+  background: transparent;
+  text-transform: uppercase;
+  font-size: .7rem;
+  letter-spacing: .1em;
+  border-radius: .25rem;
+  padding: .4rem 1rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: background .15s, color .15s;
+}
+.images-carousel .btn-outline-white:hover {
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+}
