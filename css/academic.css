@@ -432,7 +432,21 @@ footer.site-footer a:hover { color: #fff; }
 .bg-navy   { background: var(--navy) !important; }
 .mt-navbar { margin-top: 56px; }
 
-/* ── Photos page – full-viewport swiper carousel ─────────── */
+/* ── Photos page – full-viewport layout ─────────────────── */
+.photos-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Carousel fills all space between navbar and footer */
+.photos-page .images-carousel.swiper-container {
+  flex: 1 1 0;
+  min-height: 0;
+  height: 0; /* flex-grow overrides this – reliable cross-browser pattern */
+}
+
 .images-carousel.swiper-container {
   height: calc(100vh - 56px);
 }

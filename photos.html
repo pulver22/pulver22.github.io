@@ -24,7 +24,7 @@
   <link rel="apple-touch-icon" href="assets/ico/apple-touch-icon-180x180.png">
   <meta name="theme-color" content="#1a365d">
 </head>
-<body>
+<body class="photos-page">
   <div id="navigation"></div>
 
   <div class="swiper-container images-carousel">
@@ -221,11 +221,16 @@
         el: '.swiper-pagination',
         clickable: true
       },
-      slidesPerView: 1,
-      spaceBetween: 0,
+      slidesPerView: 3,
+      spaceBetween: 12,
       loop: true,
       observer: true,
-      observeParents: true
+      observeParents: true,
+      breakpoints: {
+        0:   { slidesPerView: 1, spaceBetween: 0 },
+        576: { slidesPerView: 2, spaceBetween: 8 },
+        992: { slidesPerView: 3, spaceBetween: 12 }
+      }
     });
   </script>
   <script>
