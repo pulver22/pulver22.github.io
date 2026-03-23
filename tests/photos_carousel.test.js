@@ -95,7 +95,7 @@ function assert(condition, label) {
         timeout: 20000,
       });
 
-      const metrics = await page.evaluate((slidesPerView, realSlideCount) => {
+      const metrics = await page.evaluate(() => {
         const container = document.querySelector('.swiper-container');
         const wrapper = document.querySelector('.swiper-wrapper');
         const allSlides = document.querySelectorAll('.swiper-slide');
@@ -113,7 +113,7 @@ function assert(condition, label) {
           totalSlideCount: allSlides.length,
           realSlideCount: realSlides.length,
         };
-      }, SLIDES_PER_VIEW);
+      });
 
       // Container must fit within the viewport (no feedback loop)
       assert(
