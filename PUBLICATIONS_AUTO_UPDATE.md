@@ -2,7 +2,7 @@
 
 ## Overview
 
-The publications page now automatically fetches publication data from ORCID and arXiv APIs, eliminating the need for manual updates when new papers are published.
+The publications page now automatically fetches publication data from ORCID, arXiv, and Crossref APIs, with **complete author lists and venue information**, eliminating the need for manual updates when new papers are published.
 
 ## How It Works
 
@@ -11,18 +11,29 @@ The publications page now automatically fetches publication data from ORCID and 
 1. **ORCID API** (Primary Source)
    - Fetches publication metadata from your ORCID profile
    - ORCID ID: `0000-0001-8318-7269`
-   - Endpoint: `https://pub.orcid.org/v3.0/{ORCID-ID}/works`
+   - Endpoints:
+     - Summary: `https://pub.orcid.org/v3.0/{ORCID-ID}/works`
+     - Details: `https://pub.orcid.org/v3.0/{ORCID-ID}/work/{PUT-CODE}`
    - No authentication required for public profiles
-   - Returns: titles, publication types, years, DOIs, URLs
+   - Returns: titles, publication types, years, DOIs, URLs, **authors**, venues
 
-2. **arXiv API** (Secondary Source - Preprints)
+2. **Crossref API** (Metadata Enrichment)
+   - Enriches publications with DOIs
+   - Endpoint: `https://api.crossref.org/works/{DOI}`
+   - Provides: **complete author lists**, journal/conference names, publication details
+   - Fills in missing metadata from ORCID
+
+3. **arXiv API** (Preprints)
    - Fetches preprints from arXiv
    - Search by author name: "Polvara"
    - Endpoint: `http://export.arxiv.org/api/query`
-   - Returns: titles, authors, years, abstracts, arXiv IDs
+   - Returns: titles, **full author lists**, years, abstracts, arXiv IDs
 
 ### Features
 
+- **Complete Bibliography**: Full author lists and publication venues (journals/conferences)
+- **Author Highlighting**: Automatically highlights "Polvara" in author lists with `<strong>` tags
+- **Smart Author Formatting**: Long author lists show first few, target author, and last few with "..."
 - **Automatic Updates**: Publications are fetched automatically on page load
 - **Smart Caching**: Results are cached for 24 hours to reduce API calls and improve performance
 - **Manual Refresh**: Click the "Refresh" button to force fetch latest publications
@@ -31,6 +42,23 @@ The publications page now automatically fetches publication data from ORCID and 
 - **Filtering**: Filter publications by type (Journal, Conference, Preprints)
 - **Loading States**: Shows loading spinner while fetching data
 - **Error Handling**: Gracefully handles API failures and network issues
+
+### Data Enrichment Flow
+
+```
+ORCID Summary → ORCID Details (authors) → Crossref (if DOI) → Complete Metadata
+      ↓                                           ↓
+  Put-codes                              Fill missing authors/venue
+      ↓
+  Individual work fetch
+```
+
+### Author List Formatting
+
+- **Short lists** (≤15 authors): Show all authors
+- **Long lists** (>15 authors): Show "First 3, ..., [Target Author & neighbors], ..., Last 2"
+- **Target author** ("Polvara"): Always highlighted with `<strong>` tags
+- **Multiple name formats**: Handles "Polvara R", "R Polvara", "Riccardo Polvara", etc.
 
 ### Caching
 
@@ -158,13 +186,26 @@ let useDynamicLoading = false;
 ## Future Enhancements
 
 Possible improvements:
-- Add Google Scholar integration (requires scraping or third-party service)
+- **Google Scholar**: No official API available. Google Scholar scraping is against their Terms of Service and unreliable. Current implementation uses Crossref API which provides similar metadata quality for published papers with DOIs.
+- Add Semantic Scholar API for citation counts and additional metadata
 - Support multiple ORCID IDs for co-authored papers
-- Add citation counts (requires Crossref or Semantic Scholar API)
 - Export publications to BibTeX format
 - Add search/filter by keyword or year range
 - Show abstract on click/hover
 - Add analytics for most viewed publications
+
+### Why Not Google Scholar?
+
+While Google Scholar was requested, it presents significant challenges:
+1. **No Official API**: Google does not provide a public API for Scholar
+2. **Terms of Service**: Web scraping Google Scholar violates their ToS
+3. **Unreliable**: Third-party scrapers frequently break due to anti-scraping measures
+4. **Better Alternatives**: The current solution combines:
+   - **ORCID**: Authoritative source controlled by the author
+   - **Crossref**: High-quality metadata for published papers with DOIs
+   - **arXiv**: Official API for preprints
+
+This combination provides comprehensive, reliable, and legal access to publication data equivalent to or better than Google Scholar for most use cases.
 
 ## Maintenance
 
