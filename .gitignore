@@ -9,3 +9,5 @@ dist/
 build/
 *.tmp
 *.temp
+package-lock.json
+package.json

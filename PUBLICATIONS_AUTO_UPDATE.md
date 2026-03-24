@@ -2,7 +2,7 @@
 
 ## Overview
 
-The publications page now automatically fetches publication data from ORCID, arXiv, and Crossref APIs, with **complete author lists and venue information**, eliminating the need for manual updates when new papers are published.
+The publications page now automatically fetches publication data from ORCID, arXiv, Semantic Scholar, OpenAlex, and Crossref APIs, with **complete author lists and venue information**, eliminating the need for manual updates when new papers are published.
 
 ## How It Works
 
@@ -17,13 +17,26 @@ The publications page now automatically fetches publication data from ORCID, arX
    - No authentication required for public profiles
    - Returns: titles, publication types, years, DOIs, URLs, **authors**, venues
 
-2. **Crossref API** (Metadata Enrichment)
+2. **Crossref API** (Metadata Enrichment - Primary)
    - Enriches publications with DOIs
    - Endpoint: `https://api.crossref.org/works/{DOI}`
    - Provides: **complete author lists**, journal/conference names, publication details
    - Fills in missing metadata from ORCID
 
-3. **arXiv API** (Preprints)
+3. **Semantic Scholar API** (Enrichment - arXiv & DOI)
+   - Enriches arXiv preprints and publications missing metadata
+   - Endpoint: `https://api.semanticscholar.org/graph/v1/paper/{identifier}`
+   - Works with: DOI, arXiv ID, or title search
+   - Provides: **complete author lists**, venue information
+   - Rate limit: 100 requests per 5 minutes (no API key required)
+
+4. **OpenAlex API** (Enrichment - Fallback)
+   - Open scholarly metadata source
+   - Endpoint: `https://api.openalex.org/works/{DOI}`
+   - Provides: **complete author lists**, venue/journal names
+   - No rate limits, completely free
+
+5. **arXiv API** (Preprints)
    - Fetches preprints from arXiv
    - Search by author name: "Polvara"
    - Endpoint: `http://export.arxiv.org/api/query`
@@ -44,15 +57,27 @@ The publications page now automatically fetches publication data from ORCID, arX
 - **Loading States**: Shows loading spinner while fetching data
 - **Error Handling**: Gracefully handles API failures and network issues
 
-### Data Enrichment Flow
+### Data Enrichment Flow (Waterfall Approach)
 
 ```
-ORCID Summary → ORCID Details (authors) → Crossref (if DOI) → Complete Metadata
-      ↓                                           ↓
-  Put-codes                              Fill missing authors/venue
-      ↓
-  Individual work fetch
+ORCID Publications → ORCID Details (authors) → Waterfall Enrichment
+                                                       ↓
+                                            1. Crossref (if DOI)
+                                                       ↓
+                                            2. Semantic Scholar (arXiv ID)
+                                                       ↓
+                                            3. Semantic Scholar (DOI)
+                                                       ↓
+                                            4. OpenAlex (DOI)
+                                                       ↓
+                                            5. Semantic Scholar (title search - last resort)
+                                                       ↓
+                                            Complete Metadata (authors + venue)
+
+arXiv Publications → Extract DOI (if present) → Waterfall Enrichment (same as above)
 ```
+
+The system tries each enrichment source in order until it finds complete metadata (authors + venue). This ensures maximum coverage for all publication types, especially arXiv preprints.
 
 ### Author List Formatting
 

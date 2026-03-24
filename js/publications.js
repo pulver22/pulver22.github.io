@@ -50,6 +50,9 @@ class PublicationsManager {
       const arxivPubs = await this.fetchFromArXiv();
       console.log(`Fetched ${arxivPubs.length} publications from arXiv`);
 
+      // Enrich arXiv publications with metadata from Semantic Scholar, OpenAlex, etc.
+      await this.enrichArXivPublications(arxivPubs);
+
       // Merge and deduplicate
       this.publications = this.mergePublications(orcidPubs, arxivPubs);
       console.log(`Total unique publications: ${this.publications.length}`);
@@ -198,10 +201,16 @@ class PublicationsManager {
     // Deep clone to avoid mutating the cached object until we resave
     const clone = JSON.parse(JSON.stringify(publications));
 
-    // Try to enrich missing authors/venues
+    // Try to enrich missing authors/venues using waterfall approach
     const needsRefresh = clone.filter(pub => this.needsMetadataRefresh(pub));
     if (needsRefresh.length > 0) {
-      await this.enrichWithCrossref(needsRefresh);
+      console.log(`Re-enriching ${needsRefresh.length} cached publications with missing metadata`);
+      await this.enrichArXivPublications(needsRefresh);
+      // Also try Crossref for non-arXiv publications
+      const orcidPubs = needsRefresh.filter(pub => pub.source === 'orcid');
+      if (orcidPubs.length > 0) {
+        await this.enrichWithCrossref(orcidPubs);
+      }
     }
     this.ensureAuthorConsistency(clone);
 
@@ -212,8 +221,37 @@ class PublicationsManager {
     return clone;
   }
 
+  /**
+   * Enrich arXiv publications with metadata from various sources
+   */
+  async enrichArXivPublications(publications) {
+    console.log(`Starting enrichment for ${publications.length} publications`);
+
+    const enrichmentPromises = publications.map(async (pub, index) => {
+      // Add progressive delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, index * 100));
+
+      try {
+        const enriched = await this.enrichPublication(pub);
+        if (!enriched && pub.needsEnrichment) {
+          console.warn(`⚠ Could not enrich "${pub.title.substring(0, 50)}..." from any source`);
+        }
+      } catch (error) {
+        console.warn(`Error enriching publication:`, error.message);
+      }
+    });
+
+    await Promise.all(enrichmentPromises);
+    console.log('Publication enrichment completed');
+  }
+
   needsMetadataRefresh(pub) {
-    if (!pub || !pub.doi) {
+    if (!pub) {
+      return false;
+    }
+
+    // ArXiv publications or publications with DOIs can potentially be enriched
+    if (!pub.doi && !pub.arxivId) {
       return false;
     }
 
@@ -534,6 +572,282 @@ class PublicationsManager {
   }
 
   /**
+   * Fetch metadata from Semantic Scholar API
+   */
+  async fetchFromSemanticScholar(identifier) {
+    // Identifier can be DOI, arXiv ID, or paper ID
+    // Format: "DOI:10.xxxx/xxxx" or "arXiv:xxxx.xxxxx" or just the ID
+    const url = `https://api.semanticscholar.org/graph/v1/paper/${encodeURIComponent(identifier)}?fields=title,authors,venue,year,externalIds`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Paper not found
+        }
+        throw new Error(`Semantic Scholar API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Extract and format data
+      let authors = null;
+      if (data.authors && data.authors.length > 0) {
+        authors = data.authors.map(a => a.name).filter(Boolean);
+      }
+
+      const venue = data.venue || null;
+
+      if ((authors && authors.length > 0) || venue) {
+        return { authors, venue };
+      }
+
+      return null;
+    } catch (error) {
+      console.warn(`Semantic Scholar API error for ${identifier}:`, error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch metadata from OpenAlex API
+   */
+  async fetchFromOpenAlex(doi) {
+    const url = `https://api.openalex.org/works/https://doi.org/${encodeURIComponent(doi)}`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Paper not found
+        }
+        throw new Error(`OpenAlex API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Extract and format data
+      let authors = null;
+      if (data.authorships && data.authorships.length > 0) {
+        authors = data.authorships
+          .map(authorship => authorship.author?.display_name)
+          .filter(Boolean);
+      }
+
+      // Get venue from primary_location or host_venue
+      let venue = null;
+      if (data.primary_location?.source?.display_name) {
+        venue = data.primary_location.source.display_name;
+      } else if (data.host_venue?.display_name) {
+        venue = data.host_venue.display_name;
+      }
+
+      if ((authors && authors.length > 0) || venue) {
+        return { authors, venue };
+      }
+
+      return null;
+    } catch (error) {
+      console.warn(`OpenAlex API error for DOI ${doi}:`, error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Search Semantic Scholar by title (fallback method)
+   */
+  async searchSemanticScholarByTitle(title) {
+    const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(title)}&fields=title,authors,venue,year&limit=1`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+
+      if (!data.data || data.data.length === 0) {
+        return null;
+      }
+
+      const paper = data.data[0];
+
+      // Verify title similarity (basic check)
+      const similarity = this.titleSimilarity(title, paper.title);
+      if (similarity < 0.8) {
+        console.warn(`Title mismatch: "${title}" vs "${paper.title}"`);
+        return null;
+      }
+
+      let authors = null;
+      if (paper.authors && paper.authors.length > 0) {
+        authors = paper.authors.map(a => a.name).filter(Boolean);
+      }
+
+      const venue = paper.venue || null;
+
+      if ((authors && authors.length > 0) || venue) {
+        return { authors, venue };
+      }
+
+      return null;
+    } catch (error) {
+      console.warn(`Semantic Scholar title search error:`, error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Calculate simple title similarity (normalized Levenshtein-based)
+   */
+  titleSimilarity(title1, title2) {
+    // Normalize titles
+    const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const t1 = normalize(title1);
+    const t2 = normalize(title2);
+
+    // Simple substring matching as a heuristic
+    if (t1 === t2) return 1.0;
+    if (t1.includes(t2) || t2.includes(t1)) return 0.9;
+
+    // Count matching characters
+    const shorter = t1.length < t2.length ? t1 : t2;
+    const longer = t1.length >= t2.length ? t1 : t2;
+
+    let matches = 0;
+    for (let i = 0; i < shorter.length; i++) {
+      if (longer.includes(shorter[i])) matches++;
+    }
+
+    return matches / longer.length;
+  }
+
+  /**
+   * Enrich publications with multiple metadata sources (waterfall approach)
+   */
+  async enrichPublication(pub) {
+    // Try Crossref first for DOI-based publications
+    if (pub.doi) {
+      try {
+        const crossrefData = await this.fetchFromCrossrefWithRetry(pub.doi);
+        if (crossrefData && this.isMetadataComplete(crossrefData, pub)) {
+          this.applyEnrichment(pub, crossrefData, 'Crossref');
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Crossref enrichment failed for DOI ${pub.doi}`);
+      }
+    }
+
+    // Try Semantic Scholar by arXiv ID
+    if (pub.arxivId) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 150)); // Rate limiting
+        const semanticData = await this.fetchFromSemanticScholar(`arXiv:${pub.arxivId}`);
+        if (semanticData && this.isMetadataComplete(semanticData, pub)) {
+          this.applyEnrichment(pub, semanticData, 'Semantic Scholar');
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Semantic Scholar enrichment failed for arXiv:${pub.arxivId}`);
+      }
+    }
+
+    // Try Semantic Scholar by DOI
+    if (pub.doi) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 150)); // Rate limiting
+        const semanticData = await this.fetchFromSemanticScholar(pub.doi);
+        if (semanticData && this.isMetadataComplete(semanticData, pub)) {
+          this.applyEnrichment(pub, semanticData, 'Semantic Scholar');
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Semantic Scholar enrichment failed for DOI ${pub.doi}`);
+      }
+    }
+
+    // Try OpenAlex by DOI
+    if (pub.doi) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 150)); // Rate limiting
+        const openAlexData = await this.fetchFromOpenAlex(pub.doi);
+        if (openAlexData && this.isMetadataComplete(openAlexData, pub)) {
+          this.applyEnrichment(pub, openAlexData, 'OpenAlex');
+          return true;
+        }
+      } catch (error) {
+        console.warn(`OpenAlex enrichment failed for DOI ${pub.doi}`);
+      }
+    }
+
+    // Last resort: Search by title (only for publications that really need it)
+    if (this.needsMetadataRefresh(pub) && pub.title) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 200)); // Extra rate limiting for search
+        const titleSearchData = await this.searchSemanticScholarByTitle(pub.title);
+        if (titleSearchData && this.isMetadataComplete(titleSearchData, pub)) {
+          this.applyEnrichment(pub, titleSearchData, 'Semantic Scholar (title search)');
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Title search enrichment failed for "${pub.title.substring(0, 50)}..."`);
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if enriched metadata is complete enough to use
+   */
+  isMetadataComplete(metadata, currentPub) {
+    if (!metadata) return false;
+
+    const hasGoodAuthors = metadata.authors && metadata.authors.length > 1;
+    const hasVenue = metadata.venue && metadata.venue.length > 0;
+
+    const currentAuthorCount = this.countAuthors(currentPub.authors);
+    const needsAuthors = !currentPub.authors || currentAuthorCount <= 1 || currentPub.hasPlaceholderAuthors;
+    const needsVenue = !currentPub.venue && !currentPub.journalTitle;
+
+    // Metadata is complete enough if it provides what we're missing
+    return (hasGoodAuthors && needsAuthors) || (hasVenue && needsVenue);
+  }
+
+  /**
+   * Apply enrichment data to publication
+   */
+  applyEnrichment(pub, metadata, source) {
+    let enriched = false;
+
+    if (metadata.authors && metadata.authors.length > 0) {
+      const currentAuthorCount = this.countAuthors(pub.authors);
+      if (!pub.authors || currentAuthorCount <= 1 || pub.hasPlaceholderAuthors || metadata.authors.length > currentAuthorCount) {
+        pub.authors = metadata.authors;
+        pub.hasPlaceholderAuthors = false;
+        enriched = true;
+      }
+    }
+
+    if (metadata.venue && (!pub.venue || !pub.journalTitle)) {
+      pub.venue = metadata.venue;
+      if (!pub.journalTitle) {
+        pub.journalTitle = metadata.venue;
+      }
+      enriched = true;
+    }
+
+    if (enriched) {
+      console.log(`✓ Enriched "${pub.title.substring(0, 50)}..." with ${source} data`);
+    }
+  }
+
+  /**
    * Extract DOI from ORCID work
    */
   extractDOI(work) {
@@ -662,6 +976,13 @@ class PublicationsManager {
       // Get abstract
       const summary = entry.querySelector('summary')?.textContent?.trim();
 
+      // Try to extract DOI from arXiv entry if present
+      let doi = null;
+      const doiElement = entry.querySelector('arxiv\\:doi, doi');
+      if (doiElement) {
+        doi = doiElement.textContent.trim();
+      }
+
       const pub = {
         source: 'arxiv',
         title: title,
@@ -669,9 +990,10 @@ class PublicationsManager {
         type: 'other', // arXiv papers are preprints
         url: `https://arxiv.org/abs/${arxivId}`,
         arxivId: arxivId,
-        authors: authors.join(', '),
+        authors: authors.length > 0 ? authors : null, // Keep as array for consistency
         abstract: summary,
-        doi: null
+        doi: doi,
+        needsEnrichment: true // Flag arXiv entries for enrichment
       };
 
       publications.push(pub);
