@@ -28,7 +28,7 @@ The publications page now automatically fetches publication data from ORCID, arX
 3. **arXiv API** (Preprints)
    - Fetches preprints from arXiv
    - Search by author name: "Riccardo Polvara"
-   - Endpoint: `http://export.arxiv.org/api/query`
+   - Endpoint: `https://export.arxiv.org/api/query`
    - Returns: titles, **full author lists**, years, abstracts, arXiv IDs
    - **All arXiv publications are automatically categorized as Preprints**
 
