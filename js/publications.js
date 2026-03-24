@@ -611,6 +611,78 @@ class PublicationsManager {
   }
 
   /**
+   * Search Semantic Scholar by author name to find author ID
+   */
+  async searchSemanticScholarAuthor(authorName) {
+    const url = `https://api.semanticscholar.org/graph/v1/author/search?query=${encodeURIComponent(authorName)}&limit=5&fields=authorId,name,affiliations,paperCount`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+
+      if (!data.data || data.data.length === 0) {
+        return null;
+      }
+
+      // Find best matching author
+      return this.findBestAuthorMatch(data.data, authorName);
+    } catch (error) {
+      console.warn(`Semantic Scholar author search error:`, error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Find best matching author from search results
+   */
+  findBestAuthorMatch(authors, targetName) {
+    // Calculate similarity score for each author
+    const scored = authors.map(author => {
+      const similarity = this.calculateNameSimilarity(author.name, targetName);
+      return { author, similarity };
+    });
+
+    // Sort by similarity
+    scored.sort((a, b) => b.similarity - a.similarity);
+
+    // Return best match if similarity > 0.6
+    if (scored[0] && scored[0].similarity > 0.6) {
+      return scored[0].author;
+    }
+
+    return null;
+  }
+
+  /**
+   * Calculate name similarity (simple token-based similarity)
+   */
+  calculateNameSimilarity(name1, name2) {
+    const normalize = (str) => str.toLowerCase().replace(/[^a-z]/g, '');
+    const n1 = normalize(name1);
+    const n2 = normalize(name2);
+
+    // Exact match
+    if (n1 === n2) return 1.0;
+
+    // Substring match
+    if (n1.includes(n2) || n2.includes(n1)) return 0.9;
+
+    // Token-based similarity
+    const tokens1 = new Set(name1.toLowerCase().split(/\s+/));
+    const tokens2 = new Set(name2.toLowerCase().split(/\s+/));
+
+    const intersection = new Set([...tokens1].filter(x => tokens2.has(x)));
+    const union = new Set([...tokens1, ...tokens2]);
+
+    return intersection.size / union.size;
+  }
+
+  /**
    * Fetch metadata from OpenAlex API
    */
   async fetchFromOpenAlex(doi) {

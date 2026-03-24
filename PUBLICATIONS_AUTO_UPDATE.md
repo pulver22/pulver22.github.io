@@ -41,6 +41,16 @@ The publications page now automatically fetches publication data from ORCID, arX
    - Search by author name: "Polvara"
    - Endpoint: `http://export.arxiv.org/api/query`
    - Returns: titles, **full author lists**, years, abstracts, arXiv IDs
+   - **All arXiv publications are automatically categorized as Preprints**
+
+### Why Not ResearchGate?
+
+**ResearchGate cannot be used** for the following reasons:
+- ❌ **No public API available** - ResearchGate discontinued their API in 2018
+- ❌ **Scraping violates Terms of Service** - Automated data collection is explicitly prohibited
+- ❌ **CORS restrictions** - Cannot be accessed from client-side JavaScript
+- ❌ **Anti-scraping measures** - Rate limiting, CAPTCHAs, and IP blocking prevent automated access
+- ✅ **Better alternatives**: Semantic Scholar and OpenAlex provide similar or better coverage, are completely legal, and work reliably from the browser
 
 ### Features
 
