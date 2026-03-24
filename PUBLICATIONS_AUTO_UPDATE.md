@@ -27,7 +27,7 @@ The publications page now automatically fetches publication data from ORCID, arX
 
 3. **arXiv API** (Preprints)
    - Fetches preprints from arXiv
-   - Search by author name: "Polvara"
+   - Search by author name: "Riccardo Polvara"
    - Endpoint: `http://export.arxiv.org/api/query`
    - Returns: titles, **full author lists**, years, abstracts, arXiv IDs
    - **All arXiv publications are automatically categorized as Preprints**
@@ -130,7 +130,7 @@ The system can be configured in `/publications.html` (line ~633):
 ```javascript
 pubManager = new PublicationsManager({
   orcidId: '0000-0001-8318-7269',        // Your ORCID ID
-  authorName: 'Polvara',                   // Author name for arXiv search
+  authorName: 'Riccardo Polvara',        // Author name for arXiv and Semantic Scholar search
   cacheExpiration: 24 * 60 * 60 * 1000   // Cache duration in milliseconds
 });
 ```
@@ -218,7 +218,8 @@ let useDynamicLoading = false;
 ### Missing Publications
 
 - **ORCID**: Ensure publications are added to your ORCID profile
-- **arXiv**: Ensure author name "Polvara" appears in the paper's author list
+- **arXiv**: Ensure author name "Riccardo Polvara" appears in the paper's author list
+- **Semantic Scholar**: The author-level search automatically finds all papers by "Riccardo Polvara"
 - **Cache**: Click "Refresh" to clear cache and fetch latest data
 
 ### Performance Issues
@@ -272,9 +273,9 @@ orcidId: '0000-0001-8318-7269'  // Change this
 ```
 
 ### Updating Author Name
-If searching different name on arXiv, update in `publications.html`:
+If searching different name on arXiv and Semantic Scholar, update in `publications.html`:
 ```javascript
-authorName: 'Polvara'  // Change this
+authorName: 'Riccardo Polvara'  // Use full name to avoid matching other authors with same surname
 ```
 
 ### Adjusting Cache Duration
