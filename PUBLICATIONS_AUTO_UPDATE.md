@@ -36,6 +36,7 @@ The publications page now automatically fetches publication data from ORCID, arX
 - **Smart Author Formatting**: Long author lists show first few, target author, and last few with "..."
 - **Automatic Updates**: Publications are fetched automatically on page load
 - **Smart Caching**: Results are cached for 24 hours to reduce API calls and improve performance
+- **Metadata Cache**: Crossref/BibTeX metadata cached per DOI (30 days) to keep author/venue consistent across reloads
 - **Manual Refresh**: Click the "Refresh" button to force fetch latest publications
 - **Fallback Content**: Static HTML content is preserved as fallback if API fails
 - **Deduplication**: Automatically merges and deduplicates publications from multiple sources
@@ -64,6 +65,8 @@ ORCID Summary → ORCID Details (authors) → Crossref (if DOI) → Complete Met
 
 - Publications are cached in browser's `localStorage`
 - Cache expires after 24 hours
+- DOI-level metadata (authors/venue) from Crossref/BibTeX is cached separately for 30 days to stabilize author lists
+- When cached publications are missing authors/venues, a background enrichment run refreshes them and updates the cache
 - Cache is automatically cleared on manual refresh
 - If API fails, expired cache is used as fallback
 

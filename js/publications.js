@@ -10,6 +10,8 @@ class PublicationsManager {
       authorName: config.authorName || 'Polvara',
       cacheExpiration: config.cacheExpiration || 24 * 60 * 60 * 1000, // 24 hours in ms
       useCache: config.useCache !== false,
+      metadataCacheExpiration: config.metadataCacheExpiration || 30 * 24 * 60 * 60 * 1000, // 30 days
+      metadataCacheKey: config.metadataCacheKey || 'crossref_metadata_cache_v1',
       ...config
     };
     this.publications = [];
@@ -24,6 +26,14 @@ class PublicationsManager {
       const cached = this.getFromCache();
       if (cached) {
         console.log('Using cached publications');
+        const needsRefresh = this.cachedNeedsEnrichment(cached);
+        if (needsRefresh) {
+          console.log('Refreshing cached publications with improved metadata');
+          const refreshed = await this.refreshCachedPublications(cached);
+          this.publications = refreshed;
+          return refreshed;
+        }
+
         this.publications = cached;
         return cached;
       }
@@ -180,6 +190,53 @@ class PublicationsManager {
     }
   }
 
+  cachedNeedsEnrichment(publications) {
+    return publications.some(pub => this.needsMetadataRefresh(pub));
+  }
+
+  async refreshCachedPublications(publications) {
+    // Deep clone to avoid mutating the cached object until we resave
+    const clone = JSON.parse(JSON.stringify(publications));
+
+    // Try to enrich missing authors/venues
+    const needsRefresh = clone.filter(pub => this.needsMetadataRefresh(pub));
+    if (needsRefresh.length > 0) {
+      await this.enrichWithCrossref(needsRefresh);
+    }
+    this.ensureAuthorConsistency(clone);
+
+    if (this.config.useCache) {
+      this.saveToCache(clone);
+    }
+
+    return clone;
+  }
+
+  needsMetadataRefresh(pub) {
+    if (!pub || !pub.doi) {
+      return false;
+    }
+
+    const authorCount = this.countAuthors(pub.authors);
+    const missingVenue = !pub.venue && !pub.journalTitle;
+    const weakAuthors = !pub.authors || pub.hasPlaceholderAuthors || authorCount <= 1;
+
+    return missingVenue || weakAuthors;
+  }
+
+  countAuthors(authors) {
+    if (!authors) {
+      return 0;
+    }
+    if (Array.isArray(authors)) {
+      return authors.length;
+    }
+    if (typeof authors === 'string') {
+      return authors.split(',').map(a => a.trim()).filter(Boolean).length;
+    }
+    return 0;
+  }
+
   /**
    * Fetch detailed work information from ORCID
    */
@@ -287,14 +344,15 @@ class PublicationsManager {
             let enriched = false;
 
             // Add or replace authors if Crossref has better data
-            if (crossrefData.authors && crossrefData.authors.length > 0) {
-              // If we have no authors or just a placeholder, use Crossref
-              if (!pub.authors ||
-                  (Array.isArray(pub.authors) && pub.authors.length === 0) ||
-                  (Array.isArray(pub.authors) && pub.authors.length === 1 && pub.authors[0].includes('Polvara R'))) {
-                pub.authors = crossrefData.authors;
-                enriched = true;
-              }
+            const crossrefAuthorCount = crossrefData.authors ? crossrefData.authors.length : 0;
+            const currentAuthorCount = this.countAuthors(pub.authors);
+            const weakAuthors = !pub.authors || pub.hasPlaceholderAuthors || currentAuthorCount <= 1;
+
+            if (crossrefAuthorCount > 0 &&
+                (weakAuthors || crossrefAuthorCount > currentAuthorCount)) {
+              pub.authors = crossrefData.authors;
+              pub.hasPlaceholderAuthors = false;
+              enriched = true;
             }
 
             // Add venue if not already present
@@ -358,10 +416,92 @@ class PublicationsManager {
     return null;
   }
 
+  parseCrossrefWork(work) {
+    if (!work) {
+      return null;
+    }
+
+    // Extract authors
+    let authors = null;
+    if (work.author && work.author.length > 0) {
+      authors = work.author.map(a => {
+        if (a.given && a.family) {
+          return `${a.given} ${a.family}`;
+        } else if (a.family) {
+          return a.family;
+        } else if (a.name) {
+          return a.name;
+        }
+        return null;
+      }).filter(name => name !== null);
+    }
+
+    // Extract venue (journal or conference)
+    let venue = null;
+    if (work['container-title'] && work['container-title'].length > 0) {
+      venue = work['container-title'][0];
+    } else if (work['event'] && work['event'].name) {
+      venue = work['event'].name;
+    }
+
+    if ((authors && authors.length > 0) || venue) {
+      return { authors, venue };
+    }
+    return null;
+  }
+
+  async fetchBibtexMetadata(doi) {
+    try {
+      const url = `https://api.crossref.org/works/${encodeURIComponent(doi)}/transform/application/x-bibtex`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        return null;
+      }
+      const bibtex = await response.text();
+      const parsed = this.parseBibtexMetadata(bibtex);
+      if (parsed && ((parsed.authors && parsed.authors.length > 0) || parsed.venue)) {
+        return parsed;
+      }
+    } catch (error) {
+      console.warn(`BibTeX fallback failed for DOI ${doi}:`, error);
+    }
+    return null;
+  }
+
+  parseBibtexMetadata(bibtexText) {
+    if (!bibtexText) {
+      return null;
+    }
+
+    // Extract author line
+    const authorMatch = bibtexText.match(/author\s*=\s*[{"]([^}"]+)/i);
+    let authors = null;
+    if (authorMatch && authorMatch[1]) {
+      authors = authorMatch[1]
+        .split(/\s+and\s+/i)
+        .map(a => a.replace(/[{}]/g, '').trim())
+        .filter(Boolean);
+    }
+
+    // Extract venue (journal or booktitle)
+    const venueMatch = bibtexText.match(/(?:journal|booktitle)\s*=\s*[{"]([^}"]+)/i);
+    const venue = venueMatch && venueMatch[1] ? venueMatch[1].replace(/[{}]/g, '').trim() : null;
+
+    if ((authors && authors.length > 0) || venue) {
+      return { authors, venue };
+    }
+    return null;
+  }
+
   /**
    * Fetch publication metadata from Crossref API
    */
   async fetchFromCrossref(doi) {
+    const cached = this.getCrossrefMetadataFromCache(doi);
+    if (cached) {
+      return cached;
+    }
+
     const url = `https://api.crossref.org/works/${encodeURIComponent(doi)}`;
 
     try {
@@ -374,37 +514,23 @@ class PublicationsManager {
       const data = await response.json();
       const work = data.message;
 
-      // Extract authors
-      let authors = null;
-      if (work.author && work.author.length > 0) {
-        authors = work.author.map(a => {
-          if (a.given && a.family) {
-            return `${a.given} ${a.family}`;
-          } else if (a.family) {
-            return a.family;
-          } else if (a.name) {
-            return a.name;
-          }
-          return null;
-        }).filter(name => name !== null);
+      const parsed = this.parseCrossrefWork(work);
+      if (parsed) {
+        this.saveCrossrefMetadataToCache(doi, parsed);
+        return parsed;
       }
-
-      // Extract venue (journal or conference)
-      let venue = null;
-      if (work['container-title'] && work['container-title'].length > 0) {
-        venue = work['container-title'][0];
-      } else if (work['event'] && work['event'].name) {
-        venue = work['event'].name;
-      }
-
-      return {
-        authors: authors,
-        venue: venue
-      };
     } catch (error) {
       console.warn(`Crossref API error for DOI ${doi}:`, error);
-      return null;
     }
+
+    // Fallback: attempt to fetch bibtex to recover authors/venue
+    const bibtex = await this.fetchBibtexMetadata(doi);
+    if (bibtex) {
+      this.saveCrossrefMetadataToCache(doi, bibtex);
+      return bibtex;
+    }
+
+    return null;
   }
 
   /**
@@ -627,12 +753,71 @@ class PublicationsManager {
     }
   }
 
+  getCrossrefMetadataFromCache(doi) {
+    if (!doi) {
+      return null;
+    }
+
+    try {
+      const raw = localStorage.getItem(this.config.metadataCacheKey);
+      if (!raw) {
+        return null;
+      }
+
+      const cache = JSON.parse(raw);
+      const entry = cache?.entries?.[doi.toLowerCase()];
+      if (!entry) {
+        return null;
+      }
+
+      const age = Date.now() - entry.timestamp;
+      if (age > this.config.metadataCacheExpiration) {
+        return null;
+      }
+
+      return entry.data || null;
+    } catch (error) {
+      console.warn('Failed to read metadata cache:', error);
+      return null;
+    }
+  }
+
+  saveCrossrefMetadataToCache(doi, data) {
+    if (!doi || !data) {
+      return;
+    }
+
+    try {
+      const raw = localStorage.getItem(this.config.metadataCacheKey);
+      const cache = raw ? JSON.parse(raw) : { entries: {} };
+      const key = doi.toLowerCase();
+      const existing = cache.entries[key]?.data || {};
+
+      const merged = {
+        authors: (data.authors && data.authors.length > 0) ? data.authors : existing.authors,
+        venue: data.venue || existing.venue
+      };
+
+      // Only store if we have meaningful data
+      if ((merged.authors && merged.authors.length > 0) || merged.venue) {
+        cache.entries[key] = {
+          timestamp: Date.now(),
+          data: merged
+        };
+        localStorage.setItem(this.config.metadataCacheKey, JSON.stringify(cache));
+      }
+    } catch (error) {
+      console.warn('Failed to write metadata cache:', error);
+    }
+  }
+
   /**
    * Clear cache
    */
   clearCache() {
     try {
       localStorage.removeItem('publications_cache');
+      localStorage.removeItem(this.config.metadataCacheKey);
     } catch (error) {
       console.warn('Failed to clear cache:', error);
     }
