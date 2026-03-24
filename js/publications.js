@@ -159,6 +159,7 @@ class PublicationsManager {
    */
   ensureAuthorConsistency(publications) {
     const targetAuthor = this.config.authorName || 'Polvara';
+    let placeholderCount = 0;
 
     publications.forEach(pub => {
       // If no authors at all, add a placeholder with target author as absolute last resort
@@ -168,9 +169,15 @@ class PublicationsManager {
 
         // Use a generic author entry based on ORCID profile
         pub.authors = [targetAuthor + ' R'];
-        console.warn(`No authors found for "${pub.title}" from any source (ORCID or Crossref), using placeholder. DOI: ${pub.doi || 'none'}`);
+        pub.hasPlaceholderAuthors = true; // Mark for future enrichment attempts
+        placeholderCount++;
+        console.warn(`⚠ No authors found for "${pub.title.substring(0, 50)}..." from any source (ORCID or Crossref), using placeholder. DOI: ${pub.doi || 'none'}`);
       }
     });
+
+    if (placeholderCount > 0) {
+      console.warn(`${placeholderCount} publication(s) are using placeholder authors. This may indicate API issues.`);
+    }
   }
 
   /**
@@ -266,12 +273,19 @@ class PublicationsManager {
    * Enrich publications with Crossref metadata
    */
   async enrichWithCrossref(publications) {
+    console.log(`Starting Crossref enrichment for ${publications.filter(p => p.doi).length} publications with DOIs`);
+
     const crossrefPromises = publications
       .filter(pub => pub.doi) // Try to enrich all publications with DOIs
-      .map(async pub => {
+      .map(async (pub, index) => {
+        // Add small delay between requests to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, index * 100));
+
         try {
-          const crossrefData = await this.fetchFromCrossref(pub.doi);
+          const crossrefData = await this.fetchFromCrossrefWithRetry(pub.doi);
           if (crossrefData) {
+            let enriched = false;
+
             // Add or replace authors if Crossref has better data
             if (crossrefData.authors && crossrefData.authors.length > 0) {
               // If we have no authors or just a placeholder, use Crossref
@@ -279,24 +293,69 @@ class PublicationsManager {
                   (Array.isArray(pub.authors) && pub.authors.length === 0) ||
                   (Array.isArray(pub.authors) && pub.authors.length === 1 && pub.authors[0].includes('Polvara R'))) {
                 pub.authors = crossrefData.authors;
-                console.log(`Enriched "${pub.title}" with ${crossrefData.authors.length} authors from Crossref`);
+                enriched = true;
               }
             }
+
             // Add venue if not already present
             if (!pub.venue && crossrefData.venue) {
               pub.venue = crossrefData.venue;
+              enriched = true;
             }
+
             // Update journal title if available
             if (!pub.journalTitle && crossrefData.venue) {
               pub.journalTitle = crossrefData.venue;
             }
+
+            if (enriched) {
+              console.log(`✓ Enriched "${pub.title.substring(0, 50)}..." with Crossref data`);
+            }
           }
         } catch (error) {
-          console.warn(`Failed to enrich ${pub.title} with Crossref:`, error);
+          console.warn(`Failed to enrich "${pub.title.substring(0, 50)}...":`, error.message);
         }
       });
 
     await Promise.all(crossrefPromises);
+    console.log('Crossref enrichment completed');
+  }
+
+  /**
+   * Fetch from Crossref with retry logic for transient failures
+   */
+  async fetchFromCrossrefWithRetry(doi, maxRetries = 2) {
+    let lastError = null;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        if (attempt > 0) {
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
+          console.log(`Retry ${attempt}/${maxRetries} for DOI ${doi}`);
+        }
+
+        const result = await this.fetchFromCrossref(doi);
+        if (result) {
+          return result;
+        }
+
+        // If result is null but no error thrown, don't retry
+        if (attempt === 0) {
+          return null;
+        }
+      } catch (error) {
+        lastError = error;
+        if (attempt === maxRetries) {
+          throw error;
+        }
+      }
+    }
+
+    if (lastError) {
+      throw lastError;
+    }
+    return null;
   }
 
   /**
