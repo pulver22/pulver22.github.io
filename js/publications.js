@@ -15,6 +15,9 @@ class PublicationsManager {
       ...config
     };
     this.publications = [];
+
+    // Regex for identifying conference venues.  Add new acronyms here as needed.
+    this.conferenceVenuePattern = /\b(conference|proceedings|workshop|symposium|cvpr|iccv|eccv|icra|iros|rss|nips|neurips|icml|iclr|aaai|ijcai|ral|icaps|corl|wacv|bmvc|robocup|humanoids)\b/i;
   }
 
   /**
@@ -42,24 +45,36 @@ class PublicationsManager {
     try {
       console.log('Fetching fresh publications from APIs...');
 
-      // Fetch from ORCID
+      // ── Phase 1: Collect raw data from all sources ─────────────────────────
+      // Each parser stores raw evidence fields (orcidWorkType, fromArXiv, venue, etc.)
+      // but does NOT assign a final publication type.
       const orcidPubs = await this.fetchFromORCID();
       console.log(`Fetched ${orcidPubs.length} publications from ORCID`);
 
-      // Fetch from arXiv
       const arxivPubs = await this.fetchFromArXiv();
       console.log(`Fetched ${arxivPubs.length} publications from arXiv`);
 
-      // Fetch from Semantic Scholar (author-level search)
       const semanticScholarPubs = await this.fetchFromSemanticScholarAuthor();
       console.log(`Fetched ${semanticScholarPubs.length} publications from Semantic Scholar`);
 
-      // Enrich arXiv publications with metadata from Semantic Scholar, OpenAlex, etc.
-      await this.enrichArXivPublications(arxivPubs);
-
-      // Merge and deduplicate; ORCID/Semantic Scholar journal/conference types take priority over arXiv preprint status
+      // ── Phase 2: Merge / deduplicate ───────────────────────────────────────
+      // Evidence fields (orcidWorkType, fromArXiv, …) are preserved during merge.
       this.publications = this.mergePublications(orcidPubs, arxivPubs, semanticScholarPubs);
-      console.log(`Total unique publications: ${this.publications.length}`);
+      console.log(`Total unique publications after merge: ${this.publications.length}`);
+
+      // ── Phase 3: Enrich all publications with Crossref / OpenAlex / etc. ──
+      // Runs on ALL publications (not just arXiv ones) so every entry gets the
+      // best available venue, author list, and crossrefWorkType evidence.
+      await this.enrichAllPublications(this.publications);
+
+      // ── Phase 4: Classify publication types ───────────────────────────────
+      // Final, authoritative type assignment using all collected evidence.
+      // A paper is "Preprint" only when it exclusively came from arXiv with no
+      // real (non-arXiv) DOI and no venue.
+      this.classifyPublicationTypes(this.publications);
+
+      // ── Phase 5: Ensure every publication has author information ──────────
+      this.ensureAuthorConsistency(this.publications);
 
       // Sort by year (newest first); normalize to number so string years like 'n.d.' don't break ordering
       this.publications.sort((a, b) => {
@@ -143,7 +158,11 @@ class PublicationsManager {
               source: 'orcid',
               title: detailedWork.title?.title?.value || work.title?.title?.value || 'Untitled',
               year: work['publication-date']?.year?.value || 'n.d.',
-              type: this.mapORCIDType(work.type),
+              // Store the raw ORCID type string for later authoritative classification.
+              // 'type' is set definitively in classifyPublicationTypes(); null here
+              // makes the preliminary state explicit.
+              orcidWorkType: work.type,
+              type: null, // set definitively in classifyPublicationTypes()
               url: this.extractORCIDUrl(work),
               putCode: putCode,
               journalTitle: work['journal-title']?.value || null,
@@ -161,19 +180,16 @@ class PublicationsManager {
     // Fetch detailed work info with limited concurrency to avoid throttling
     const results = await this.runWithConcurrencyLimit(detailPromises, 5);
 
-    // Filter out nulls and add to publications
+    // Filter out nulls and collect publications
     results.forEach(pub => {
       if (pub) {
         publications.push(pub);
       }
     });
 
-    // Enrich with Crossref data for publications with DOIs
-    await this.enrichWithCrossref(publications);
-
-    // Ensure all publications have author information for consistency
-    this.ensureAuthorConsistency(publications);
-
+    // Note: Crossref enrichment and author consistency are handled later in
+    // enrichAllPublications() and ensureAuthorConsistency() during the main
+    // Collect → Merge → Enrich → Classify pipeline.
     return publications;
   }
 
@@ -246,17 +262,14 @@ class PublicationsManager {
     // Deep clone to avoid mutating the cached object until we resave
     const clone = JSON.parse(JSON.stringify(publications));
 
-    // Try to enrich missing authors/venues using waterfall approach
+    // Try to enrich missing authors/venues using the full enrichment pipeline
     const needsRefresh = clone.filter(pub => this.needsMetadataRefresh(pub));
     if (needsRefresh.length > 0) {
       console.log(`Re-enriching ${needsRefresh.length} cached publications with missing metadata`);
-      await this.enrichArXivPublications(needsRefresh);
-      // Also try Crossref for non-arXiv publications
-      const orcidPubs = needsRefresh.filter(pub => pub.source === 'orcid');
-      if (orcidPubs.length > 0) {
-        await this.enrichWithCrossref(orcidPubs);
-      }
+      await this.enrichAllPublications(needsRefresh);
     }
+    // Re-classify and ensure consistency in case evidence fields changed
+    this.classifyPublicationTypes(clone);
     this.ensureAuthorConsistency(clone);
 
     if (this.config.useCache) {
@@ -267,15 +280,31 @@ class PublicationsManager {
   }
 
   /**
-   * Enrich arXiv publications with metadata from various sources
+   * Enrich ALL publications (regardless of source) with metadata from Crossref,
+   * Semantic Scholar, OpenAlex, etc.
+   *
+   * This replaces the previous approach of enriching arXiv pubs separately before
+   * merge.  Running after merge means each publication already has all available
+   * evidence fields (orcidWorkType, fromArXiv, …) before enrichment starts.
+   *
+   * Flow:
+   *  1. Run Crossref enrichment for every pub that has a real (non-arXiv) DOI.
+   *     Crossref is the most reliable source for venue/author/type data.
+   *  2. For pubs that still need metadata (missing venue or weak authors), run
+   *     the Semantic Scholar → OpenAlex → title-search waterfall.
    */
-  async enrichArXivPublications(publications) {
+  async enrichAllPublications(publications) {
     console.log(`Starting enrichment for ${publications.length} publications`);
 
-    const enrichmentPromises = publications.map(async (pub, index) => {
-      // Add progressive delay to respect rate limits
-      await new Promise(resolve => setTimeout(resolve, index * 100));
+    // Step 1: Crossref enrichment for pubs with real DOIs
+    await this.enrichWithCrossref(publications);
 
+    // Step 2: Waterfall enrichment for pubs that still need metadata
+    const needsWaterfall = publications.filter(pub => this.needsMetadataRefresh(pub));
+    console.log(`Running waterfall enrichment for ${needsWaterfall.length} publications`);
+
+    const enrichmentPromises = needsWaterfall.map(async (pub, index) => {
+      await new Promise(resolve => setTimeout(resolve, index * 100)); // rate limit
       try {
         const enriched = await this.enrichPublication(pub);
         if (!enriched && pub.needsEnrichment) {
@@ -288,6 +317,14 @@ class PublicationsManager {
 
     await Promise.all(enrichmentPromises);
     console.log('Publication enrichment completed');
+  }
+
+  /**
+   * @deprecated Use enrichAllPublications() instead.
+   * Kept for any external callers; delegates to enrichAllPublications.
+   */
+  async enrichArXivPublications(publications) {
+    return this.enrichAllPublications(publications);
   }
 
   needsMetadataRefresh(pub) {
@@ -410,13 +447,36 @@ class PublicationsManager {
   }
 
   /**
-   * Enrich publications with Crossref metadata
+   * Returns true when a DOI is an arXiv DOI (10.48550/arXiv.*).
+   * arXiv DOIs do NOT indicate publication in a journal or conference;
+   * they must not be treated as evidence of a "real" publication.
+   */
+  isArxivDoi(doi) {
+    return typeof doi === 'string' && doi.toLowerCase().startsWith('10.48550/');
+  }
+
+  /**
+   * Returns true when a venue string refers to arXiv itself (not a real publication venue).
+   * Semantic Scholar returns "arXiv.org" or "arXiv" as the venue for preprints;
+   * these must not be treated as publication evidence in any venue-based logic.
+   */
+  isArxivVenue(venue) {
+    if (!venue || typeof venue !== 'string') return false;
+    const v = venue.trim().toLowerCase();
+    return v === 'arxiv' || v === 'arxiv.org' || v.startsWith('arxiv:') || v.startsWith('arxiv ');
+  }
+
+  /**
+   * Enrich publications with Crossref metadata.
+   * Skips arXiv DOIs (10.48550/…) — those are not published-work identifiers.
+   * Stores the Crossref work type as `pub.crossrefWorkType` for use during the
+   * final classification step (classifyPublicationTypes).
    */
   async enrichWithCrossref(publications) {
-    console.log(`Starting Crossref enrichment for ${publications.filter(p => p.doi).length} publications with DOIs`);
+    const realDoiPubs = publications.filter(pub => pub.doi && !this.isArxivDoi(pub.doi));
+    console.log(`Starting Crossref enrichment for ${realDoiPubs.length} publications with real DOIs`);
 
-    const crossrefPromises = publications
-      .filter(pub => pub.doi) // Try to enrich all publications with DOIs
+    const crossrefPromises = realDoiPubs
       .map(async (pub, index) => {
         // Add small delay between requests to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, index * 100));
@@ -438,13 +498,10 @@ class PublicationsManager {
               enriched = true;
             }
 
-            // Update type from Crossref when the current classification is not already a specific
-            // journal/conference type and Crossref tells us it's a published journal article or
-            // conference paper
-            if (crossrefData.type &&
-                pub.type !== 'journal' && pub.type !== 'conference' &&
-                (crossrefData.type === 'journal' || crossrefData.type === 'conference')) {
-              pub.type = crossrefData.type;
+            // Store Crossref type as evidence for classifyPublicationTypes().
+            // Do NOT set pub.type directly here; classification happens later.
+            if (crossrefData.type && !pub.crossrefWorkType) {
+              pub.crossrefWorkType = crossrefData.type; // 'journal' or 'conference'
               enriched = true;
             }
 
@@ -663,8 +720,11 @@ class PublicationsManager {
 
       const venue = data.venue || null;
 
-      if ((authors && authors.length > 0) || venue) {
-        return { authors, venue };
+      // Extract DOI from externalIds so arXiv papers can be matched with their published version
+      const doi = data.externalIds?.DOI || null;
+
+      if ((authors && authors.length > 0) || venue || doi) {
+        return { authors, venue, doi };
       }
 
       return null;
@@ -823,13 +883,22 @@ class PublicationsManager {
             }
           }
 
+          // Semantic Scholar returns "arXiv.org" or "arXiv" as the venue for preprints.
+          // Storing this as pub.venue would make the classifier think it's a journal.
+          // Null it out so only real publication venues are stored.
+          const rawVenue = paper.venue && !this.isArxivVenue(paper.venue) ? paper.venue : null;
+
           return {
             source: 'semantic-scholar',
+            // Mark as preprint if this paper has an arXiv ID but no real published DOI.
+            // This ensures classifyPublicationTypes() catches it even when the arXiv API
+            // independently missed this paper (source remains 'semantic-scholar').
+            fromArXiv: arxivId != null && (doi == null || this.isArxivDoi(doi)) ? true : undefined,
             title: paper.title,
             year: paper.year,
-            type: type,
+            type: null, // set definitively in classifyPublicationTypes()
             authors: authors,
-            venue: paper.venue || null,
+            venue: rawVenue,
             doi: doi,
             arxivId: arxivId,
             url: doi ? `https://doi.org/${doi}` : (arxivId ? `https://arxiv.org/abs/${arxivId}` : null),
@@ -1069,13 +1138,27 @@ class PublicationsManager {
       }
     }
 
-    if (metadata.venue && (!pub.venue || !pub.journalTitle)) {
+    // Only propagate venue when it is a real (non-arXiv) venue.
+    // Semantic Scholar returns "arXiv.org" as the venue for preprints; storing
+    // that would make the classifier misidentify the paper as a journal article.
+    if (metadata.venue && !this.isArxivVenue(metadata.venue) && (!pub.venue || !pub.journalTitle)) {
       pub.venue = metadata.venue;
       if (!pub.journalTitle) {
         pub.journalTitle = metadata.venue;
       }
       enriched = true;
     }
+
+    // Propagate DOI only when it is a real (non-arXiv) DOI.
+    // arXiv DOIs (10.48550/arXiv.*) returned by Semantic Scholar do NOT indicate
+    // publication in a journal or conference and must not overwrite pub.doi.
+    if (metadata.doi && !pub.doi && !this.isArxivDoi(metadata.doi)) {
+      pub.doi = metadata.doi;
+      enriched = true;
+    }
+
+    // Do NOT set pub.type directly from waterfall enrichment — type assignment is
+    // deferred to classifyPublicationTypes() which uses all evidence at once.
 
     if (enriched) {
       console.log(`✓ Enriched "${pub.title.substring(0, 50)}..." with ${source} data`);
@@ -1220,9 +1303,10 @@ class PublicationsManager {
 
       const pub = {
         source: 'arxiv',
+        fromArXiv: true, // explicit flag for classification; persists through merge
         title: title,
         year: year,
-        type: 'other', // arXiv papers are preprints
+        type: null, // set definitively in classifyPublicationTypes()
         url: `https://arxiv.org/abs/${arxivId}`,
         arxivId: arxivId,
         authors: authors.length > 0 ? authors : null, // Keep as array for consistency
@@ -1239,56 +1323,122 @@ class PublicationsManager {
 
   /**
    * Merge publications from multiple sources and remove duplicates.
-   * When a paper appears in both ORCID/Semantic Scholar (as journal/conference) and arXiv
-   * (as preprint), the journal/conference classification takes priority — the arXiv version
-   * is only a preprint of the same work, not a separate publication.
-   * A publication is only classified as 'Preprint' when it exclusively comes from arXiv.
+   *
+   * Deduplication key priority: real DOI > arXiv ID > ORCID put-code > title+year.
+   * arXiv DOIs (10.48550/…) are NOT used as keys — they fall through to arXiv ID.
+   *
+   * During merge, evidence fields collected from each source are accumulated on the
+   * single surviving record so that classifyPublicationTypes() later has the full
+   * picture.  The `source` field is NOT changed during merge (it retains the value
+   * from the first-seen entry); instead, the `fromArXiv` boolean flag is set when
+   * any version of the paper came from arXiv.
    */
   mergePublications(...sources) {
     const merged = [];
-    const keyMap = new Map(); // Track which publications we've seen
+    const keyMap = new Map();       // primary key → pub
+    const titleYearMap = new Map(); // secondary key (title+year, exact) → pub
+    const titleOnlyMap = new Map(); // tertiary key (title only, for year-mismatch cross-source) → pub
 
     sources.forEach(source => {
       source.forEach(pub => {
         // Create a unique key for deduplication
         const key = this.createPublicationKey(pub);
 
-        if (!keyMap.has(key)) {
-          // First time seeing this publication
+        // ── Level 1: primary key lookup ────────────────────────────────────
+        // Catches exact-identifier matches (doi:xxx, arxiv:xxx, orcid:xxx).
+        let existing = keyMap.get(key);
+
+        // ── Level 2: title + year exact match ─────────────────────────────
+        // Catches same-year duplicates where sources disagree on the primary
+        // identifier (e.g. ORCID has a real DOI, arXiv has only arXiv ID).
+        if (!existing) {
+          const tyKey = this.createTitleYearKey(pub);
+          if (tyKey) {
+            existing = titleYearMap.get(tyKey);
+            if (existing) {
+              keyMap.set(key, existing);
+            }
+          }
+        }
+
+        // ── Level 3: title-only match with year-proximity guard ────────────
+        // Catches duplicates where the year differs between sources — most
+        // commonly ORCID uses the journal publication year while arXiv stores
+        // the submission year (can differ by 1–2 years), or when ORCID has no
+        // date ('n.d.').  We allow a mismatch of up to 2 years to avoid
+        // accidentally merging genuinely different papers with similar titles.
+        if (!existing) {
+          const toKey = this.createTitleOnlyKey(pub);
+          if (toKey) {
+            const candidate = titleOnlyMap.get(toKey);
+            if (candidate && this.yearDifference(pub.year, candidate.year) <= 2) {
+              existing = candidate;
+              keyMap.set(key, existing);
+            }
+          }
+        }
+
+        if (!existing) {
+          // First time seeing this publication — add to merged list
           keyMap.set(key, pub);
+          const tyKey = this.createTitleYearKey(pub);
+          if (tyKey && !titleYearMap.has(tyKey)) {
+            titleYearMap.set(tyKey, pub);
+          }
+          const toKey = this.createTitleOnlyKey(pub);
+          if (toKey && !titleOnlyMap.has(toKey)) {
+            titleOnlyMap.set(toKey, pub);
+          }
           merged.push(pub);
         } else {
-          // Publication already exists - merge metadata from duplicate
-          const existing = keyMap.get(key);
+          // Duplicate found — accumulate evidence onto the existing record
 
-          // Always preserve arXiv ID when available from either source
-          if (pub.arxivId) {
-            existing.arxivId = existing.arxivId || pub.arxivId;
+          // Propagate arXiv identity
+          if (pub.arxivId && !existing.arxivId) {
+            existing.arxivId = pub.arxivId;
+          }
+          // Propagate fromArXiv flag so classification knows this paper was on arXiv
+          if (pub.fromArXiv || pub.source === 'arxiv') {
+            existing.fromArXiv = true;
           }
 
-          // If the new publication is from arXiv, preserve its arXiv ID but
-          // do NOT override a journal/conference classification from ORCID or Semantic Scholar.
-          // A paper that was posted as a preprint and later published in a journal should
-          // retain the journal classification.
-          if (pub.source === 'arxiv') {
-            if (existing.type !== 'journal' && existing.type !== 'conference') {
-              // Only mark as preprint if there's no better classification yet
-              existing.type = 'other';
-              existing.source = 'arxiv';
+          // Propagate ORCID work type (authoritative for ORCID-sourced entries)
+          if (pub.orcidWorkType && !existing.orcidWorkType) {
+            existing.orcidWorkType = pub.orcidWorkType;
+          }
+
+          // Propagate ORCID put-code for URL resolution
+          if (pub.putCode && !existing.putCode) {
+            existing.putCode = pub.putCode;
+          }
+
+          // Propagate venue/journalTitle if existing lacks them — but NEVER propagate
+          // arXiv-like venue strings ("arXiv.org", "arXiv") as they are not real venues
+          if (pub.venue && !existing.venue && !this.isArxivVenue(pub.venue)) {
+            existing.venue = pub.venue;
+          }
+          if (pub.journalTitle && !existing.journalTitle && !this.isArxivVenue(pub.journalTitle)) {
+            existing.journalTitle = pub.journalTitle;
+          }
+
+          // Propagate real (non-arXiv) DOI if existing lacks one
+          if (pub.doi && !existing.doi && !this.isArxivDoi(pub.doi)) {
+            existing.doi = pub.doi;
+          }
+
+          // Propagate authors if existing has weak/no authors
+          if (pub.authors) {
+            const existingCount = this.countAuthors(existing.authors);
+            const pubCount = this.countAuthors(pub.authors);
+            if (!existing.authors || existing.hasPlaceholderAuthors ||
+                pubCount > existingCount) {
+              existing.authors = pub.authors;
+              existing.hasPlaceholderAuthors = pub.hasPlaceholderAuthors || false;
             }
-            // If existing already has journal/conference type, keep it
           }
 
-          // If the new publication has a better type (journal/conference) and the
-          // existing entry is still a generic preprint, upgrade it
-          if ((pub.type === 'journal' || pub.type === 'conference') &&
-              existing.type === 'other') {
-            existing.type = pub.type;
-            // Also carry over venue if the preprint entry lacks one
-            if (pub.venue && !existing.venue) {
-              existing.venue = pub.venue;
-            }
-          }
+          // Note: pub.type is NOT used here — classifyPublicationTypes() will
+          // assign the definitive type using all accumulated evidence fields.
         }
       });
     });
@@ -1297,26 +1447,113 @@ class PublicationsManager {
   }
 
   /**
-   * Create a unique key for a publication (for deduplication)
+   * Classify publication types based on all collected evidence.
+   *
+   * This is the ONLY place where pub.type is set to its final value.
+   * It runs after all sources have been collected, merged, and enriched so
+   * every publication has the most complete evidence available.
+   *
+   * Classification priority:
+   *  1. orcidWorkType  – most authoritative for ORCID-sourced publications
+   *  2. crossrefWorkType – highly reliable for any published work
+   *  3. venue text patterns – reliable inference for named venues
+   *  4. real (non-arXiv) DOI – signals publication even if venue is unknown
+   *  5. fromArXiv with no real DOI / venue → Preprint
+   *  6. Default → journal (avoids false "Preprint" label for non-arXiv entries
+   *     with incomplete metadata such as datasets or book chapters)
+   */
+  classifyPublicationTypes(publications) {
+    publications.forEach(pub => {
+      // 1. ORCID work type is the most authoritative source
+      if (pub.orcidWorkType) {
+        const mapped = this.mapORCIDType(pub.orcidWorkType);
+        if (mapped === 'journal' || mapped === 'conference') {
+          pub.type = mapped;
+          return;
+        }
+      }
+
+      // 2. Crossref work type — highly reliable for published works
+      if (pub.crossrefWorkType === 'journal') {
+        pub.type = 'journal';
+        return;
+      }
+      if (pub.crossrefWorkType === 'conference') {
+        pub.type = 'conference';
+        return;
+      }
+
+      // 3. Infer from venue text — but skip arXiv-like venue strings ("arXiv.org", "arXiv",
+      //    "arXiv preprint arXiv:xxxx.xxxxx") which are NOT real publication venues.
+      //    Capture the flag first so step 5 can use it as a preprint signal.
+      const venueStr = (pub.venue || pub.journalTitle || '').trim();
+      const hasArxivVenueClue = this.isArxivVenue(venueStr);
+      if (venueStr && !hasArxivVenueClue) {
+        pub.type = this.conferenceVenuePattern.test(venueStr) ? 'conference' : 'journal';
+        return;
+      }
+
+      // 4. Has a real (non-arXiv) DOI → published somewhere even if venue is unknown
+      if (pub.doi && !this.isArxivDoi(pub.doi)) {
+        pub.type = 'journal';
+        return;
+      }
+
+      // 5. Preprint detection — any of these signals means exclusively an arXiv preprint:
+      //    a. fromArXiv flag (set by arXiv parser, merge propagation, or S2 parser)
+      //    b. source === 'arxiv'
+      //    c. has arXiv ID but no real published DOI (catches Semantic Scholar-only entries)
+      //    d. doi is an arXiv-only DOI (10.48550/…) — no real publication evidence
+      //    e. venue string itself is an arXiv preprint string (e.g. "arXiv preprint arXiv:2601.13196")
+      //       — the only clue when an entry has no arxivId or DOI (e.g. from BibTeX journal field)
+      const hasArxivId = pub.arxivId && typeof pub.arxivId === 'string' && pub.arxivId.trim() !== '';
+      const hasRealDoi = pub.doi && !this.isArxivDoi(pub.doi);
+      if (pub.fromArXiv || pub.source === 'arxiv' ||
+          (hasArxivId && !hasRealDoi) ||
+          (pub.doi && this.isArxivDoi(pub.doi)) ||
+          hasArxivVenueClue) {
+        pub.type = 'other'; // Preprint
+        return;
+      }
+
+      // 6. Default for non-arXiv pubs with incomplete metadata (datasets, book chapters, etc.)
+      pub.type = 'journal';
+    });
+  }
+
+  /**
+   * @deprecated Use classifyPublicationTypes() instead.
+   * Kept for backward compatibility; delegates to the new method.
+   */
+  normalizePublicationTypes(publications) {
+    return this.classifyPublicationTypes(publications);
+  }
+
+  /**
+   * Create a unique key for a publication (for deduplication).
+   * Uses the single most stable identifier available so that the same paper
+   * from different sources (e.g. ORCID and arXiv) always produces the same key
+   * and gets correctly deduplicated.
+   * Priority: real DOI > arXiv ID > ORCID put-code > normalised title+year
+   *
+   * arXiv DOIs (10.48550/…) are intentionally excluded from the DOI slot because
+   * they do not identify a published work and would prevent cross-source matching.
    */
   createPublicationKey(pub) {
-    // Prefer stable identifiers when available
-    const idParts = [];
-
-    if (pub && typeof pub.doi === 'string' && pub.doi.trim() !== '') {
-      idParts.push(`doi:${pub.doi.toLowerCase()}`);
+    // Real (non-arXiv) DOI is the most stable cross-source identifier
+    if (pub && typeof pub.doi === 'string' && pub.doi.trim() !== '' &&
+        !this.isArxivDoi(pub.doi)) {
+      return `doi:${pub.doi.toLowerCase().trim()}`;
     }
+
+    // arXiv ID as secondary identifier
     if (pub && typeof pub.arxivId === 'string' && pub.arxivId.trim() !== '') {
-      idParts.push(`arxiv:${pub.arxivId.toLowerCase()}`);
-    }
-    if (pub && (typeof pub.putCode === 'string' || typeof pub.putCode === 'number')) {
-      // ORCID put-codes are numeric in the API response but may be stored as strings after
-      // JSON round-trips; accept both to be safe.
-      idParts.push(`orcid:${String(pub.putCode)}`);
+      return `arxiv:${pub.arxivId.toLowerCase().trim()}`;
     }
 
-    if (idParts.length > 0) {
-      return idParts.join('|');
+    // ORCID put-code as tertiary identifier
+    if (pub && (typeof pub.putCode === 'string' || typeof pub.putCode === 'number')) {
+      return `orcid:${String(pub.putCode)}`;
     }
 
     // Fallback: use normalized title and year
@@ -1329,8 +1566,64 @@ class PublicationsManager {
   }
 
   /**
-   * Save publications to localStorage
+   * Create a secondary deduplication key based on normalized title + year.
+   *
+   * Used as a fallback when two sources give the same paper different primary
+   * identifiers — e.g. ORCID has a real DOI (key = "doi:…") while the arXiv
+   * parser found the same paper only by arXiv ID (key = "arxiv:…").  Matching
+   * on title+year catches these cross-source duplicates.
+   *
+   * Returns null when either the title or the year is missing (to avoid
+   * spurious matches for anonymous/undated entries).
+   *
+   * The 50-character cap matches the one used in createPublicationKey() and is
+   * long enough to distinguish virtually all academic titles while staying well
+   * within string-comparison performance bounds.
    */
+  createTitleYearKey(pub) {
+    if (!pub || typeof pub.title !== 'string' || !pub.title) return null;
+    const normalizedTitle = pub.title.toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .substring(0, 50); // 50 chars: same cap as createPublicationKey fallback
+    const yearPart = pub.year != null ? String(pub.year) : '';
+    if (!normalizedTitle || !yearPart) return null;
+    return `title:${normalizedTitle}-${yearPart}`;
+  }
+
+  /**
+   * Create a title-only deduplication key (no year component).
+   *
+   * Used as a tertiary fallback in mergePublications() to catch same-paper
+   * duplicates where the ORCID publication year differs from the arXiv
+   * submission year (e.g. ORCID has 2023, arXiv has 2022) or where the ORCID
+   * record has no publication date ('n.d.').  A year-proximity guard in the
+   * caller prevents false merges when the years are more than 2 years apart.
+   *
+   * Returns null when the title is missing.
+   */
+  createTitleOnlyKey(pub) {
+    if (!pub || typeof pub.title !== 'string' || !pub.title) return null;
+    const normalizedTitle = pub.title.toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .substring(0, 50);
+    if (!normalizedTitle) return null;
+    return `titleonly:${normalizedTitle}`;
+  }
+
+  /**
+   * Return the absolute year difference between two year values.
+   * Returns 0 when either value is missing or non-numeric (e.g. 'n.d.')
+   * so that the year-proximity guard always allows the merge — it is better
+   * to merge an undated ORCID record with an arXiv entry than to show a
+   * duplicate.
+   */
+  yearDifference(yearA, yearB) {
+    const a = parseInt(yearA, 10);
+    const b = parseInt(yearB, 10);
+    if (isNaN(a) || isNaN(b)) return 0; // one side is 'n.d.' — allow merge
+    return Math.abs(a - b);
+  }
+
   saveToCache(publications) {
     const cacheData = {
       timestamp: Date.now(),
