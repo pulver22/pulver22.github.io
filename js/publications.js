@@ -456,6 +456,17 @@ class PublicationsManager {
   }
 
   /**
+   * Returns true when a venue string refers to arXiv itself (not a real publication venue).
+   * Semantic Scholar returns "arXiv.org" or "arXiv" as the venue for preprints;
+   * these must not be treated as publication evidence in any venue-based logic.
+   */
+  isArxivVenue(venue) {
+    if (!venue || typeof venue !== 'string') return false;
+    const v = venue.trim().toLowerCase();
+    return v === 'arxiv' || v === 'arxiv.org' || v.startsWith('arxiv:') || v.startsWith('arxiv ');
+  }
+
+  /**
    * Enrich publications with Crossref metadata.
    * Skips arXiv DOIs (10.48550/…) — those are not published-work identifiers.
    * Stores the Crossref work type as `pub.crossrefWorkType` for use during the
@@ -872,13 +883,22 @@ class PublicationsManager {
             }
           }
 
+          // Semantic Scholar returns "arXiv.org" or "arXiv" as the venue for preprints.
+          // Storing this as pub.venue would make the classifier think it's a journal.
+          // Null it out so only real publication venues are stored.
+          const rawVenue = paper.venue && !this.isArxivVenue(paper.venue) ? paper.venue : null;
+
           return {
             source: 'semantic-scholar',
+            // Mark as preprint if this paper has an arXiv ID but no real published DOI.
+            // This ensures classifyPublicationTypes() catches it even when the arXiv API
+            // independently missed this paper (source remains 'semantic-scholar').
+            fromArXiv: arxivId != null && (doi == null || this.isArxivDoi(doi)) ? true : undefined,
             title: paper.title,
             year: paper.year,
-            type: type,
+            type: null, // set definitively in classifyPublicationTypes()
             authors: authors,
-            venue: paper.venue || null,
+            venue: rawVenue,
             doi: doi,
             arxivId: arxivId,
             url: doi ? `https://doi.org/${doi}` : (arxivId ? `https://arxiv.org/abs/${arxivId}` : null),
@@ -1118,7 +1138,10 @@ class PublicationsManager {
       }
     }
 
-    if (metadata.venue && (!pub.venue || !pub.journalTitle)) {
+    // Only propagate venue when it is a real (non-arXiv) venue.
+    // Semantic Scholar returns "arXiv.org" as the venue for preprints; storing
+    // that would make the classifier misidentify the paper as a journal article.
+    if (metadata.venue && !this.isArxivVenue(metadata.venue) && (!pub.venue || !pub.journalTitle)) {
       pub.venue = metadata.venue;
       if (!pub.journalTitle) {
         pub.journalTitle = metadata.venue;
@@ -1346,11 +1369,12 @@ class PublicationsManager {
             existing.putCode = pub.putCode;
           }
 
-          // Propagate venue/journalTitle if existing lacks them
-          if (pub.venue && !existing.venue) {
+          // Propagate venue/journalTitle if existing lacks them — but NEVER propagate
+          // arXiv-like venue strings ("arXiv.org", "arXiv") as they are not real venues
+          if (pub.venue && !existing.venue && !this.isArxivVenue(pub.venue)) {
             existing.venue = pub.venue;
           }
-          if (pub.journalTitle && !existing.journalTitle) {
+          if (pub.journalTitle && !existing.journalTitle && !this.isArxivVenue(pub.journalTitle)) {
             existing.journalTitle = pub.journalTitle;
           }
 
@@ -1416,9 +1440,10 @@ class PublicationsManager {
         return;
       }
 
-      // 3. Infer from venue text
+      // 3. Infer from venue text — but skip arXiv-like venue strings ("arXiv.org", "arXiv")
+      //    which Semantic Scholar uses for preprints and which are NOT publication venues.
       const venueStr = (pub.venue || pub.journalTitle || '').trim();
-      if (venueStr) {
+      if (venueStr && !this.isArxivVenue(venueStr)) {
         pub.type = this.conferenceVenuePattern.test(venueStr) ? 'conference' : 'journal';
         return;
       }
@@ -1429,8 +1454,16 @@ class PublicationsManager {
         return;
       }
 
-      // 5. Paper came from arXiv with no evidence of journal/conference publication
-      if (pub.fromArXiv || pub.source === 'arxiv') {
+      // 5. Preprint detection — any of these signals means exclusively an arXiv preprint:
+      //    a. fromArXiv flag (set by arXiv parser, merge propagation, or S2 parser)
+      //    b. source === 'arxiv'
+      //    c. has arXiv ID but no real published DOI (catches Semantic Scholar-only entries)
+      //    d. doi is an arXiv-only DOI (10.48550/…) — no real publication evidence
+      const hasArxivId = pub.arxivId && typeof pub.arxivId === 'string' && pub.arxivId.trim() !== '';
+      const hasRealDoi = pub.doi && !this.isArxivDoi(pub.doi);
+      if (pub.fromArXiv || pub.source === 'arxiv' ||
+          (hasArxivId && !hasRealDoi) ||
+          (pub.doi && this.isArxivDoi(pub.doi))) {
         pub.type = 'other'; // Preprint
         return;
       }
