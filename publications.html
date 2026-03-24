@@ -605,14 +605,6 @@
           document.querySelectorAll(".pub-item").forEach(function(item) {
             item.style.display = (filter === "all" || item.dataset.type === filter) ? "" : "none";
           });
-          document.querySelectorAll(".pub-section-heading").forEach(function(heading) {
-            var section = heading.dataset.section;
-            if (filter === "all" || filter === section) {
-              heading.style.display = "";
-            } else {
-              heading.style.display = "none";
-            }
-          });
         });
       });
     }

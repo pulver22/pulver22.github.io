@@ -1147,47 +1147,15 @@ class PublicationsManager {
 
   /**
    * Render publications to HTML
+   * Now displays all publications chronologically with type tags
    */
   renderPublications(publications, container) {
-    const groupedByType = {
-      journal: [],
-      conference: [],
-      other: []
-    };
-
-    // Group publications by type
-    publications.forEach(pub => {
-      if (groupedByType[pub.type]) {
-        groupedByType[pub.type].push(pub);
-      }
-    });
-
-    // Create HTML for each section
-    let html = '';
-
-    // Journal Papers
-    if (groupedByType.journal.length > 0) {
-      html += '<h3 class="pub-section-heading" data-section="journal">Journal Papers</h3>';
-      html += '<ul class="pub-list">';
-      html += groupedByType.journal.map(pub => this.renderPublicationItem(pub)).join('');
-      html += '</ul>';
-    }
-
-    // Conference Papers
-    if (groupedByType.conference.length > 0) {
-      html += '<h3 class="pub-section-heading" data-section="conference">Conference Papers</h3>';
-      html += '<ul class="pub-list">';
-      html += groupedByType.conference.map(pub => this.renderPublicationItem(pub)).join('');
-      html += '</ul>';
-    }
-
-    // Other (Preprints & Presentations)
-    if (groupedByType.other.length > 0) {
-      html += '<h3 class="pub-section-heading" data-section="other">Presentations &amp; Preprints</h3>';
-      html += '<ul class="pub-list">';
-      html += groupedByType.other.map(pub => this.renderPublicationItem(pub)).join('');
-      html += '</ul>';
-    }
+    // Create HTML with all publications in chronological order
+    // Publications are already sorted by year (newest first) in fetchPublications
+    let html = '<h3 class="pub-section-heading">Publications</h3>';
+    html += '<ul class="pub-list">';
+    html += publications.map(pub => this.renderPublicationItem(pub)).join('');
+    html += '</ul>';
 
     // Insert into container
     if (container) {
@@ -1199,6 +1167,7 @@ class PublicationsManager {
 
   /**
    * Render a single publication item
+   * Now includes type tag (journal/conference/preprint) along with other links
    */
   renderPublicationItem(pub) {
     const url = pub.url || '#';
@@ -1208,7 +1177,14 @@ class PublicationsManager {
     const venueText = pub.venue || pub.journalTitle;
     const venue = venueText ? `<em>${this.escapeHtml(venueText)}</em>` : '';
 
+    // Build links including type tag
     let links = '';
+
+    // Add type tag
+    const typeLabel = this.getTypeLabel(pub.type);
+    links += `<span class="pub-type-tag" data-type="${pub.type}">${typeLabel}</span>`;
+
+    // Add URL link
     if (pub.url) {
       if (pub.arxivId) {
         links += `<a href="${pub.url}">arXiv</a>`;
@@ -1235,6 +1211,18 @@ class PublicationsManager {
         </div>
       </li>
     `;
+  }
+
+  /**
+   * Get human-readable label for publication type
+   */
+  getTypeLabel(type) {
+    const typeLabels = {
+      'journal': 'Journal',
+      'conference': 'Conference',
+      'other': 'Preprint'
+    };
+    return typeLabels[type] || 'Other';
   }
 
   /**
