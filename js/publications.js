@@ -1335,20 +1335,40 @@ class PublicationsManager {
    */
   mergePublications(...sources) {
     const merged = [];
-    const keyMap = new Map(); // Track which publications we've seen
+    const keyMap = new Map();      // primary key → pub
+    const titleYearMap = new Map(); // secondary key (title+year) → pub
 
     sources.forEach(source => {
       source.forEach(pub => {
         // Create a unique key for deduplication
         const key = this.createPublicationKey(pub);
 
-        if (!keyMap.has(key)) {
+        // Look up by primary key first; fall back to title+year secondary key.
+        // The secondary lookup catches the common case where ORCID has a real
+        // DOI (key = "doi:…") for a paper that the arXiv API also returned with
+        // only an arXiv ID (key = "arxiv:…") — different primary keys but same paper.
+        let existing = keyMap.get(key);
+        if (!existing) {
+          const tyKey = this.createTitleYearKey(pub);
+          if (tyKey) {
+            existing = titleYearMap.get(tyKey);
+            if (existing) {
+              // Register this new primary key so future dups with the same key merge too
+              keyMap.set(key, existing);
+            }
+          }
+        }
+
+        if (!existing) {
           // First time seeing this publication — add to merged list
           keyMap.set(key, pub);
+          const tyKey = this.createTitleYearKey(pub);
+          if (tyKey && !titleYearMap.has(tyKey)) {
+            titleYearMap.set(tyKey, pub);
+          }
           merged.push(pub);
         } else {
           // Duplicate found — accumulate evidence onto the existing record
-          const existing = keyMap.get(key);
 
           // Propagate arXiv identity
           if (pub.arxivId && !existing.arxivId) {
@@ -1440,10 +1460,12 @@ class PublicationsManager {
         return;
       }
 
-      // 3. Infer from venue text — but skip arXiv-like venue strings ("arXiv.org", "arXiv")
-      //    which Semantic Scholar uses for preprints and which are NOT publication venues.
+      // 3. Infer from venue text — but skip arXiv-like venue strings ("arXiv.org", "arXiv",
+      //    "arXiv preprint arXiv:xxxx.xxxxx") which are NOT real publication venues.
+      //    Capture the flag first so step 5 can use it as a preprint signal.
       const venueStr = (pub.venue || pub.journalTitle || '').trim();
-      if (venueStr && !this.isArxivVenue(venueStr)) {
+      const hasArxivVenueClue = this.isArxivVenue(venueStr);
+      if (venueStr && !hasArxivVenueClue) {
         pub.type = this.conferenceVenuePattern.test(venueStr) ? 'conference' : 'journal';
         return;
       }
@@ -1459,11 +1481,14 @@ class PublicationsManager {
       //    b. source === 'arxiv'
       //    c. has arXiv ID but no real published DOI (catches Semantic Scholar-only entries)
       //    d. doi is an arXiv-only DOI (10.48550/…) — no real publication evidence
+      //    e. venue string itself is an arXiv preprint string (e.g. "arXiv preprint arXiv:2601.13196")
+      //       — the only clue when an entry has no arxivId or DOI (e.g. from BibTeX journal field)
       const hasArxivId = pub.arxivId && typeof pub.arxivId === 'string' && pub.arxivId.trim() !== '';
       const hasRealDoi = pub.doi && !this.isArxivDoi(pub.doi);
       if (pub.fromArXiv || pub.source === 'arxiv' ||
           (hasArxivId && !hasRealDoi) ||
-          (pub.doi && this.isArxivDoi(pub.doi))) {
+          (pub.doi && this.isArxivDoi(pub.doi)) ||
+          hasArxivVenueClue) {
         pub.type = 'other'; // Preprint
         return;
       }
@@ -1518,8 +1543,30 @@ class PublicationsManager {
   }
 
   /**
-   * Save publications to localStorage
+   * Create a secondary deduplication key based on normalized title + year.
+   *
+   * Used as a fallback when two sources give the same paper different primary
+   * identifiers — e.g. ORCID has a real DOI (key = "doi:…") while the arXiv
+   * parser found the same paper only by arXiv ID (key = "arxiv:…").  Matching
+   * on title+year catches these cross-source duplicates.
+   *
+   * Returns null when either the title or the year is missing (to avoid
+   * spurious matches for anonymous/undated entries).
+   *
+   * The 50-character cap matches the one used in createPublicationKey() and is
+   * long enough to distinguish virtually all academic titles while staying well
+   * within string-comparison performance bounds.
    */
+  createTitleYearKey(pub) {
+    if (!pub || typeof pub.title !== 'string' || !pub.title) return null;
+    const normalizedTitle = pub.title.toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .substring(0, 50); // 50 chars: same cap as createPublicationKey fallback
+    const yearPart = pub.year != null ? String(pub.year) : '';
+    if (!normalizedTitle || !yearPart) return null;
+    return `title:${normalizedTitle}-${yearPart}`;
+  }
+
   saveToCache(publications) {
     const cacheData = {
       timestamp: Date.now(),
