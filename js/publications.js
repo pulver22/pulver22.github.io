@@ -15,6 +15,9 @@ class PublicationsManager {
       ...config
     };
     this.publications = [];
+
+    // Regex for identifying conference venues.  Add new acronyms here as needed.
+    this.conferenceVenuePattern = /\b(conference|proceedings|workshop|symposium|cvpr|iccv|eccv|icra|iros|rss|nips|neurips|icml|iclr|aaai|ijcai|ral|icaps|corl|wacv|bmvc|robocup|humanoids)\b/i;
   }
 
   /**
@@ -60,6 +63,10 @@ class PublicationsManager {
       // Merge and deduplicate; ORCID/Semantic Scholar journal/conference types take priority over arXiv preprint status
       this.publications = this.mergePublications(orcidPubs, arxivPubs, semanticScholarPubs);
       console.log(`Total unique publications: ${this.publications.length}`);
+
+      // Normalise any remaining unclassified entries: only arXiv-only papers with no venue/DOI
+      // should show as "Preprint"
+      this.normalizePublicationTypes(this.publications);
 
       // Sort by year (newest first); normalize to number so string years like 'n.d.' don't break ordering
       this.publications.sort((a, b) => {
@@ -663,8 +670,11 @@ class PublicationsManager {
 
       const venue = data.venue || null;
 
-      if ((authors && authors.length > 0) || venue) {
-        return { authors, venue };
+      // Extract DOI from externalIds so arXiv papers can be matched with their published version
+      const doi = data.externalIds?.DOI || null;
+
+      if ((authors && authors.length > 0) || venue || doi) {
+        return { authors, venue, doi };
       }
 
       return null;
@@ -1077,6 +1087,21 @@ class PublicationsManager {
       enriched = true;
     }
 
+    // Propagate DOI when the publication doesn't already have one (e.g. arXiv papers
+    // whose published version is found via Semantic Scholar)
+    if (metadata.doi && !pub.doi) {
+      pub.doi = metadata.doi;
+      enriched = true;
+    }
+
+    // Update type when enrichment knows the published type and current type is unclassified
+    if (metadata.type &&
+        pub.type !== 'journal' && pub.type !== 'conference' &&
+        (metadata.type === 'journal' || metadata.type === 'conference')) {
+      pub.type = metadata.type;
+      enriched = true;
+    }
+
     if (enriched) {
       console.log(`✓ Enriched "${pub.title.substring(0, 50)}..." with ${source} data`);
     }
@@ -1297,26 +1322,64 @@ class PublicationsManager {
   }
 
   /**
-   * Create a unique key for a publication (for deduplication)
+   * Normalise publication types after merging and enrichment.
+   *
+   * A publication is only labelled "Preprint" when it exclusively came from
+   * arXiv (source === 'arxiv') AND has no DOI pointing to a published work
+   * AND has no venue/journalTitle indicating journal or conference publication.
+   *
+   * For all other papers with type 'other', we infer the correct type from the
+   * available venue string (conference keywords → 'conference', anything else →
+   * 'journal') or default to 'journal' for non-arXiv papers with missing metadata.
+   */
+  normalizePublicationTypes(publications) {
+    publications.forEach(pub => {
+      // Already correctly classified – nothing to do
+      if (pub.type === 'journal' || pub.type === 'conference') {
+        return;
+      }
+
+      // Try to infer type from the venue or journalTitle
+      const venueStr = (pub.venue || pub.journalTitle || '').trim();
+      if (venueStr) {
+        pub.type = this.conferenceVenuePattern.test(venueStr) ? 'conference' : 'journal';
+        return;
+      }
+
+      // No venue available.  Only keep 'other' (displayed as "Preprint") when the
+      // paper comes exclusively from arXiv and has no DOI indicating it was published.
+      // For non-arXiv papers (e.g. ORCID entries for datasets, book chapters, etc.)
+      // with missing venue metadata, we default to 'journal' rather than showing
+      // the misleading "Preprint" label; the user can always see the actual work
+      // type via the ORCID link.
+      if (pub.source !== 'arxiv' || pub.doi) {
+        pub.type = 'journal';
+      }
+      // arXiv papers with no DOI and no venue remain 'other' → "Preprint" (correct)
+    });
+  }
+
+  /**
+   * Create a unique key for a publication (for deduplication).
+   * Uses the single most stable identifier available so that the same paper
+   * from different sources (e.g. ORCID and arXiv) always produces the same key
+   * and gets correctly deduplicated.
+   * Priority: DOI > arXiv ID > ORCID put-code > normalised title+year
    */
   createPublicationKey(pub) {
-    // Prefer stable identifiers when available
-    const idParts = [];
-
+    // DOI is the most stable cross-source identifier
     if (pub && typeof pub.doi === 'string' && pub.doi.trim() !== '') {
-      idParts.push(`doi:${pub.doi.toLowerCase()}`);
-    }
-    if (pub && typeof pub.arxivId === 'string' && pub.arxivId.trim() !== '') {
-      idParts.push(`arxiv:${pub.arxivId.toLowerCase()}`);
-    }
-    if (pub && (typeof pub.putCode === 'string' || typeof pub.putCode === 'number')) {
-      // ORCID put-codes are numeric in the API response but may be stored as strings after
-      // JSON round-trips; accept both to be safe.
-      idParts.push(`orcid:${String(pub.putCode)}`);
+      return `doi:${pub.doi.toLowerCase().trim()}`;
     }
 
-    if (idParts.length > 0) {
-      return idParts.join('|');
+    // arXiv ID as secondary identifier
+    if (pub && typeof pub.arxivId === 'string' && pub.arxivId.trim() !== '') {
+      return `arxiv:${pub.arxivId.toLowerCase().trim()}`;
+    }
+
+    // ORCID put-code as tertiary identifier
+    if (pub && (typeof pub.putCode === 'string' || typeof pub.putCode === 'number')) {
+      return `orcid:${String(pub.putCode)}`;
     }
 
     // Fallback: use normalized title and year
