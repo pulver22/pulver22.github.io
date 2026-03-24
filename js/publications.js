@@ -50,11 +50,15 @@ class PublicationsManager {
       const arxivPubs = await this.fetchFromArXiv();
       console.log(`Fetched ${arxivPubs.length} publications from arXiv`);
 
+      // Fetch from Semantic Scholar (author-level search)
+      const semanticScholarPubs = await this.fetchFromSemanticScholarAuthor();
+      console.log(`Fetched ${semanticScholarPubs.length} publications from Semantic Scholar`);
+
       // Enrich arXiv publications with metadata from Semantic Scholar, OpenAlex, etc.
       await this.enrichArXivPublications(arxivPubs);
 
-      // Merge and deduplicate
-      this.publications = this.mergePublications(orcidPubs, arxivPubs);
+      // Merge and deduplicate (arXiv sources have priority for type categorization)
+      this.publications = this.mergePublications(orcidPubs, arxivPubs, semanticScholarPubs);
       console.log(`Total unique publications: ${this.publications.length}`);
 
       // Sort by year (newest first)
@@ -683,6 +687,104 @@ class PublicationsManager {
   }
 
   /**
+   * Fetch all publications from Semantic Scholar for a given author
+   */
+  async fetchFromSemanticScholarAuthor() {
+    const authorName = this.config.authorName;
+
+    console.log(`Searching Semantic Scholar for author: ${authorName}`);
+
+    // First, find the author ID
+    const author = await this.searchSemanticScholarAuthor(authorName);
+
+    if (!author || !author.authorId) {
+      console.warn(`Could not find Semantic Scholar author ID for: ${authorName}`);
+      return [];
+    }
+
+    console.log(`Found Semantic Scholar author: ${author.name} (ID: ${author.authorId}, ${author.paperCount} papers)`);
+
+    try {
+      // Fetch author's papers
+      const url = `https://api.semanticscholar.org/graph/v1/author/${author.authorId}/papers?fields=paperId,title,year,authors,venue,externalIds&limit=500`;
+
+      await new Promise(resolve => setTimeout(resolve, 150)); // Rate limiting
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Semantic Scholar API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.data || data.data.length === 0) {
+        console.log('No papers found for this author');
+        return [];
+      }
+
+      console.log(`Fetched ${data.data.length} papers from Semantic Scholar`);
+
+      // Parse papers into publication format
+      const publications = data.data
+        .filter(paper => paper.title && paper.year) // Only include papers with title and year
+        .map(paper => {
+          // Extract DOI and arXiv ID if available
+          let doi = null;
+          let arxivId = null;
+
+          if (paper.externalIds) {
+            doi = paper.externalIds.DOI || null;
+            arxivId = paper.externalIds.ArXiv || null;
+          }
+
+          // Parse authors
+          let authors = null;
+          if (paper.authors && paper.authors.length > 0) {
+            authors = paper.authors.map(a => a.name).filter(Boolean);
+          }
+
+          // Infer publication type from venue
+          let type = 'other'; // Default to preprint
+          if (paper.venue) {
+            const venueLower = paper.venue.toLowerCase();
+            // Check for conference patterns
+            if (venueLower.includes('conference') ||
+                venueLower.includes('proceedings') ||
+                venueLower.includes('workshop') ||
+                venueLower.match(/\b(cvpr|iccv|eccv|icra|iros|rss|nips|neurips|icml|iclr|aaai|ijcai)\b/)) {
+              type = 'conference';
+            }
+            // Check for journal patterns
+            else if (venueLower.includes('journal') ||
+                     venueLower.includes('transactions') ||
+                     venueLower.includes('letters') ||
+                     venueLower.match(/\b(ieee|acm|springer|elsevier|nature|science)\b/)) {
+              type = 'journal';
+            }
+          }
+
+          return {
+            source: 'semantic-scholar',
+            title: paper.title,
+            year: paper.year,
+            type: type,
+            authors: authors,
+            venue: paper.venue || null,
+            doi: doi,
+            arxivId: arxivId,
+            url: doi ? `https://doi.org/${doi}` : (arxivId ? `https://arxiv.org/abs/${arxivId}` : null),
+            semanticScholarId: paper.paperId
+          };
+        });
+
+      return publications;
+    } catch (error) {
+      console.error('Error fetching papers from Semantic Scholar:', error);
+      return [];
+    }
+  }
+
+  /**
    * Fetch metadata from OpenAlex API
    */
   async fetchFromOpenAlex(doi) {
@@ -800,25 +902,12 @@ class PublicationsManager {
 
   /**
    * Enrich publications with multiple metadata sources (waterfall approach)
+   * Priority order: Semantic Scholar → Crossref → OpenAlex → title search
    */
   async enrichPublication(pub) {
-    // Try Crossref first for DOI-based publications
-    if (pub.doi) {
-      try {
-        const crossrefData = await this.fetchFromCrossrefWithRetry(pub.doi);
-        if (crossrefData && this.isMetadataComplete(crossrefData, pub)) {
-          this.applyEnrichment(pub, crossrefData, 'Crossref');
-          return true;
-        }
-      } catch (error) {
-        console.warn(`Crossref enrichment failed for DOI ${pub.doi}`);
-      }
-    }
-
-    // Try Semantic Scholar by arXiv ID
+    // Try Semantic Scholar first by arXiv ID
     if (pub.arxivId) {
       try {
-        await new Promise(resolve => setTimeout(resolve, 150)); // Rate limiting
         const semanticData = await this.fetchFromSemanticScholar(`arXiv:${pub.arxivId}`);
         if (semanticData && this.isMetadataComplete(semanticData, pub)) {
           this.applyEnrichment(pub, semanticData, 'Semantic Scholar');
@@ -840,6 +929,20 @@ class PublicationsManager {
         }
       } catch (error) {
         console.warn(`Semantic Scholar enrichment failed for DOI ${pub.doi}`);
+      }
+    }
+
+    // Try Crossref for DOI-based publications
+    if (pub.doi) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 150)); // Rate limiting
+        const crossrefData = await this.fetchFromCrossrefWithRetry(pub.doi);
+        if (crossrefData && this.isMetadataComplete(crossrefData, pub)) {
+          this.applyEnrichment(pub, crossrefData, 'Crossref');
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Crossref enrichment failed for DOI ${pub.doi}`);
       }
     }
 
@@ -1076,19 +1179,36 @@ class PublicationsManager {
 
   /**
    * Merge publications from multiple sources and remove duplicates
+   * Preserves arXiv preprint status even when publication appears in multiple sources
    */
   mergePublications(...sources) {
     const merged = [];
-    const seen = new Set();
+    const keyMap = new Map(); // Track which publications we've seen
 
     sources.forEach(source => {
       source.forEach(pub => {
         // Create a unique key for deduplication
         const key = this.createPublicationKey(pub);
 
-        if (!seen.has(key)) {
-          seen.add(key);
+        if (!keyMap.has(key)) {
+          // First time seeing this publication
+          keyMap.set(key, pub);
           merged.push(pub);
+        } else {
+          // Publication already exists - check if this is an arXiv version
+          const existing = keyMap.get(key);
+
+          // If the new publication is from arXiv, ensure it's marked as preprint
+          if (pub.source === 'arxiv') {
+            existing.type = 'other'; // Ensure arXiv publications are always preprints
+            existing.arxivId = pub.arxivId || existing.arxivId; // Preserve arXiv ID
+            existing.source = 'arxiv'; // Mark source as arXiv
+          }
+
+          // If the existing publication is from arXiv, keep it as preprint
+          if (existing.source === 'arxiv') {
+            existing.type = 'other'; // Ensure it stays as preprint
+          }
         }
       });
     });

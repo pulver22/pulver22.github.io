@@ -2,13 +2,21 @@
 
 ## Overview
 
-The publications page now automatically fetches publication data from ORCID, arXiv, Semantic Scholar, OpenAlex, and Crossref APIs, with **complete author lists and venue information**, eliminating the need for manual updates when new papers are published.
+The publications page now automatically fetches publication data from ORCID, arXiv, and **Semantic Scholar author-level search**, with additional metadata enrichment from Semantic Scholar, OpenAlex, and Crossref APIs. This provides **complete author lists and venue information**, eliminating the need for manual updates when new papers are published.
 
 ## How It Works
 
 ### Data Sources
 
-1. **ORCID API** (Primary Source)
+1. **Semantic Scholar API** (Primary Source - Author Search)
+   - Fetches **all publications** directly from Semantic Scholar by author
+   - Automatically searches and matches author by name
+   - Endpoint: `https://api.semanticscholar.org/graph/v1/author/{authorId}/papers`
+   - Provides: **complete author lists**, venue information, DOIs, arXiv IDs
+   - Rate limit: 100 requests per 5 minutes (no API key required)
+   - **Most comprehensive source** - discovers publications not in ORCID
+
+2. **ORCID API** (Secondary Source)
    - Fetches publication metadata from your ORCID profile
    - ORCID ID: `0000-0001-8318-7269`
    - Endpoints:
@@ -17,31 +25,33 @@ The publications page now automatically fetches publication data from ORCID, arX
    - No authentication required for public profiles
    - Returns: titles, publication types, years, DOIs, URLs, **authors**, venues
 
-2. **Crossref API** (Metadata Enrichment - Primary)
-   - Enriches publications with DOIs
-   - Endpoint: `https://api.crossref.org/works/{DOI}`
-   - Provides: **complete author lists**, journal/conference names, publication details
-   - Fills in missing metadata from ORCID
-
-3. **Semantic Scholar API** (Enrichment - arXiv & DOI)
-   - Enriches arXiv preprints and publications missing metadata
-   - Endpoint: `https://api.semanticscholar.org/graph/v1/paper/{identifier}`
-   - Works with: DOI, arXiv ID, or title search
-   - Provides: **complete author lists**, venue information
-   - Rate limit: 100 requests per 5 minutes (no API key required)
-
-4. **OpenAlex API** (Enrichment - Fallback)
-   - Open scholarly metadata source
-   - Endpoint: `https://api.openalex.org/works/{DOI}`
-   - Provides: **complete author lists**, venue/journal names
-   - No rate limits, completely free
-
-5. **arXiv API** (Preprints)
+3. **arXiv API** (Preprints)
    - Fetches preprints from arXiv
    - Search by author name: "Polvara"
    - Endpoint: `http://export.arxiv.org/api/query`
    - Returns: titles, **full author lists**, years, abstracts, arXiv IDs
    - **All arXiv publications are automatically categorized as Preprints**
+
+### Metadata Enrichment Sources
+
+4. **Semantic Scholar API** (Enrichment - Primary)
+   - Enriches publications with missing metadata
+   - Endpoint: `https://api.semanticscholar.org/graph/v1/paper/{identifier}`
+   - Works with: DOI, arXiv ID, or title search
+   - Provides: **complete author lists**, venue information
+   - **Tried first** for enrichment
+
+5. **Crossref API** (Enrichment - Secondary)
+   - Enriches publications with DOIs
+   - Endpoint: `https://api.crossref.org/works/{DOI}`
+   - Provides: **complete author lists**, journal/conference names, publication details
+   - Fills in missing metadata when Semantic Scholar doesn't have it
+
+6. **OpenAlex API** (Enrichment - Fallback)
+   - Open scholarly metadata source
+   - Endpoint: `https://api.openalex.org/works/{DOI}`
+   - Provides: **complete author lists**, venue/journal names
+   - No rate limits, completely free
 
 ### Why Not ResearchGate?
 
@@ -70,24 +80,32 @@ The publications page now automatically fetches publication data from ORCID, arX
 ### Data Enrichment Flow (Waterfall Approach)
 
 ```
-ORCID Publications → ORCID Details (authors) → Waterfall Enrichment
-                                                       ↓
-                                            1. Crossref (if DOI)
-                                                       ↓
-                                            2. Semantic Scholar (arXiv ID)
-                                                       ↓
-                                            3. Semantic Scholar (DOI)
-                                                       ↓
-                                            4. OpenAlex (DOI)
-                                                       ↓
-                                            5. Semantic Scholar (title search - last resort)
-                                                       ↓
-                                            Complete Metadata (authors + venue)
-
-arXiv Publications → Extract DOI (if present) → Waterfall Enrichment (same as above)
+Publication Sources (Parallel):
+  ├─ ORCID Publications → ORCID Details (authors)
+  ├─ arXiv Publications → Extract authors + DOI (if present)
+  └─ Semantic Scholar Author Search → All author's papers
+                    ↓
+              Merge & Deduplicate
+              (arXiv publications always marked as Preprints)
+                    ↓
+          Waterfall Enrichment (for incomplete metadata):
+                    ↓
+          1. Semantic Scholar (arXiv ID or DOI) ← FIRST
+                    ↓
+          2. Crossref (DOI)
+                    ↓
+          3. OpenAlex (DOI)
+                    ↓
+          4. Semantic Scholar (title search - last resort)
+                    ↓
+          Complete Metadata (authors + venue)
 ```
 
-The system tries each enrichment source in order until it finds complete metadata (authors + venue). This ensures maximum coverage for all publication types, especially arXiv preprints.
+**Key Changes:**
+- **Semantic Scholar author search** now fetches all publications by the author
+- **Semantic Scholar is tried first** for enrichment (before Crossref)
+- **arXiv publications always remain as Preprints** even after enrichment
+- The system combines multiple sources for maximum coverage
 
 ### Author List Formatting
 
