@@ -57,7 +57,7 @@ class PublicationsManager {
       // Enrich arXiv publications with metadata from Semantic Scholar, OpenAlex, etc.
       await this.enrichArXivPublications(arxivPubs);
 
-      // Merge and deduplicate (arXiv sources have priority for type categorization)
+      // Merge and deduplicate; ORCID/Semantic Scholar journal/conference types take priority over arXiv preprint status
       this.publications = this.mergePublications(orcidPubs, arxivPubs, semanticScholarPubs);
       console.log(`Total unique publications: ${this.publications.length}`);
 
@@ -438,6 +438,16 @@ class PublicationsManager {
               enriched = true;
             }
 
+            // Update type from Crossref when the current classification is not already a specific
+            // journal/conference type and Crossref tells us it's a published journal article or
+            // conference paper
+            if (crossrefData.type &&
+                pub.type !== 'journal' && pub.type !== 'conference' &&
+                (crossrefData.type === 'journal' || crossrefData.type === 'conference')) {
+              pub.type = crossrefData.type;
+              enriched = true;
+            }
+
             // Add venue if not already present
             if (!pub.venue && crossrefData.venue) {
               pub.venue = crossrefData.venue;
@@ -527,8 +537,17 @@ class PublicationsManager {
       venue = work['event'].name;
     }
 
+    // Map Crossref work type to our categories
+    let type = null;
+    const crossrefType = work.type || '';
+    if (crossrefType === 'journal-article') {
+      type = 'journal';
+    } else if (crossrefType === 'proceedings-article' || crossrefType === 'proceedings') {
+      type = 'conference';
+    }
+
     if ((authors && authors.length > 0) || venue) {
-      return { authors, venue };
+      return { authors, venue, type };
     }
     return null;
   }
@@ -1219,8 +1238,11 @@ class PublicationsManager {
   }
 
   /**
-   * Merge publications from multiple sources and remove duplicates
-   * Preserves arXiv preprint status even when publication appears in multiple sources
+   * Merge publications from multiple sources and remove duplicates.
+   * When a paper appears in both ORCID/Semantic Scholar (as journal/conference) and arXiv
+   * (as preprint), the journal/conference classification takes priority — the arXiv version
+   * is only a preprint of the same work, not a separate publication.
+   * A publication is only classified as 'Preprint' when it exclusively comes from arXiv.
    */
   mergePublications(...sources) {
     const merged = [];
@@ -1236,19 +1258,36 @@ class PublicationsManager {
           keyMap.set(key, pub);
           merged.push(pub);
         } else {
-          // Publication already exists - check if this is an arXiv version
+          // Publication already exists - merge metadata from duplicate
           const existing = keyMap.get(key);
 
-          // If the new publication is from arXiv, ensure it's marked as preprint
-          if (pub.source === 'arxiv') {
-            existing.type = 'other'; // Ensure arXiv publications are always preprints
-            existing.arxivId = pub.arxivId || existing.arxivId; // Preserve arXiv ID
-            existing.source = 'arxiv'; // Mark source as arXiv
+          // Always preserve arXiv ID when available from either source
+          if (pub.arxivId) {
+            existing.arxivId = existing.arxivId || pub.arxivId;
           }
 
-          // If the existing publication is from arXiv, keep it as preprint
-          if (existing.source === 'arxiv') {
-            existing.type = 'other'; // Ensure it stays as preprint
+          // If the new publication is from arXiv, preserve its arXiv ID but
+          // do NOT override a journal/conference classification from ORCID or Semantic Scholar.
+          // A paper that was posted as a preprint and later published in a journal should
+          // retain the journal classification.
+          if (pub.source === 'arxiv') {
+            if (existing.type !== 'journal' && existing.type !== 'conference') {
+              // Only mark as preprint if there's no better classification yet
+              existing.type = 'other';
+              existing.source = 'arxiv';
+            }
+            // If existing already has journal/conference type, keep it
+          }
+
+          // If the new publication has a better type (journal/conference) and the
+          // existing entry is still a generic preprint, upgrade it
+          if ((pub.type === 'journal' || pub.type === 'conference') &&
+              existing.type === 'other') {
+            existing.type = pub.type;
+            // Also carry over venue if the preprint entry lacks one
+            if (pub.venue && !existing.venue) {
+              existing.venue = pub.venue;
+            }
           }
         }
       });
