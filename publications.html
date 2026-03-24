@@ -602,18 +602,49 @@
     // Initialize publications manager
     let pubManager = null;
     let useDynamicLoading = true; // Set to false to use static HTML only
+    let filtersInitialized = false; // Guard to ensure filter listeners are added only once
 
-    // Filter functionality
+    // Apply the current active filter to all pub-items and section headings.
+    // Called after each render (dynamic or static) to update visibility.
+    function applyActiveFilter() {
+      const activeBtn = document.querySelector("#pub-filters .btn.active");
+      const filter = activeBtn ? activeBtn.dataset.filter : "all";
+
+      // Show/hide individual publication items
+      document.querySelectorAll(".pub-item").forEach(function(item) {
+        item.style.display = (filter === "all" || item.dataset.type === filter) ? "" : "none";
+      });
+
+      // Show/hide section headings based on whether they have visible items below them
+      document.querySelectorAll(".pub-section-heading").forEach(function(heading) {
+        let hasVisibleItem = false;
+        let sibling = heading.nextElementSibling;
+        while (sibling && !sibling.classList.contains("pub-section-heading")) {
+          if (sibling.classList.contains("pub-item") && sibling.style.display !== "none") {
+            hasVisibleItem = true;
+            break;
+          }
+          sibling = sibling.nextElementSibling;
+        }
+        heading.style.display = hasVisibleItem ? "" : "none";
+      });
+    }
+
+    // Filter functionality – listeners are registered once using event delegation
     function setupFilters() {
-      document.querySelectorAll("#pub-filters .btn").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          document.querySelectorAll("#pub-filters .btn").forEach(function(b){ b.classList.remove("active"); });
-          this.classList.add("active");
-          var filter = this.dataset.filter;
-          document.querySelectorAll(".pub-item").forEach(function(item) {
-            item.style.display = (filter === "all" || item.dataset.type === filter) ? "" : "none";
-          });
-        });
+      if (filtersInitialized) {
+        // Listeners already attached; just re-apply the current filter to new content
+        applyActiveFilter();
+        return;
+      }
+      filtersInitialized = true;
+
+      document.getElementById("pub-filters").addEventListener("click", function(e) {
+        var btn = e.target.closest(".btn");
+        if (!btn) return;
+        document.querySelectorAll("#pub-filters .btn").forEach(function(b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        applyActiveFilter();
       });
     }
 

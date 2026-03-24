@@ -61,8 +61,15 @@ class PublicationsManager {
       this.publications = this.mergePublications(orcidPubs, arxivPubs, semanticScholarPubs);
       console.log(`Total unique publications: ${this.publications.length}`);
 
-      // Sort by year (newest first)
-      this.publications.sort((a, b) => b.year - a.year);
+      // Sort by year (newest first); normalize to number so string years like 'n.d.' don't break ordering
+      this.publications.sort((a, b) => {
+        const yearA = parseInt(a.year, 10);
+        const yearB = parseInt(b.year, 10);
+        if (isNaN(yearA) && isNaN(yearB)) return 0;
+        if (isNaN(yearA)) return 1;
+        if (isNaN(yearB)) return -1;
+        return yearB - yearA;
+      });
 
       // Cache the results
       if (this.config.useCache) {
@@ -151,8 +158,8 @@ class PublicationsManager {
       );
     });
 
-    // Wait for all detailed work fetches to complete
-    const results = await Promise.all(detailPromises);
+    // Fetch detailed work info with limited concurrency to avoid throttling
+    const results = await this.runWithConcurrencyLimit(detailPromises, 5);
 
     // Filter out nulls and add to publications
     results.forEach(pub => {
@@ -171,11 +178,45 @@ class PublicationsManager {
   }
 
   /**
+   * Run an array of promises with a concurrency limit.
+   * Accepts either promise values or thunks (functions returning promises).
+   * JavaScript's single-threaded event loop ensures that the shared `index`
+   * variable is accessed atomically: each worker only advances `index` while
+   * it holds the JS thread (i.e. between `await` points), so there is no
+   * actual race condition here.
+   */
+  async runWithConcurrencyLimit(tasks, limit) {
+    const results = new Array(tasks.length);
+    let index = 0; // shared cursor; safe because JS is single-threaded between awaits
+
+    async function worker() {
+      while (index < tasks.length) {
+        const i = index++;
+        const task = tasks[i];
+        results[i] = await (typeof task === 'function' ? task() : task);
+      }
+    }
+
+    const workers = [];
+    for (let i = 0; i < Math.min(limit, tasks.length); i++) {
+      workers.push(worker());
+    }
+    await Promise.all(workers);
+    return results;
+  }
+
+  /**
    * Ensure all publications have author information for display consistency
    * This is a last resort fallback - should only trigger if ORCID and Crossref both fail
    */
   ensureAuthorConsistency(publications) {
     const targetAuthor = this.config.authorName || 'Polvara';
+    // Derive a "Surname I" style placeholder from the configured name
+    // e.g. "Riccardo Polvara" → "Polvara R", "Polvara" → "Polvara"
+    const nameParts = targetAuthor.trim().split(/\s+/);
+    const placeholder = nameParts.length >= 2
+      ? `${nameParts[nameParts.length - 1]} ${nameParts[0][0]}`
+      : targetAuthor;
     let placeholderCount = 0;
 
     publications.forEach(pub => {
@@ -185,7 +226,7 @@ class PublicationsManager {
           (typeof pub.authors === 'string' && pub.authors.trim() === '')) {
 
         // Use a generic author entry based on ORCID profile
-        pub.authors = [targetAuthor + ' R'];
+        pub.authors = [placeholder];
         pub.hasPlaceholderAuthors = true; // Mark for future enrichment attempts
         placeholderCount++;
         console.warn(`⚠ No authors found for "${pub.title.substring(0, 50)}..." from any source (ORCID or Crossref), using placeholder. DOI: ${pub.doi || 'none'}`);
@@ -1110,7 +1151,7 @@ class PublicationsManager {
    */
   async fetchFromArXiv() {
     const author = this.config.authorName;
-    const url = `http://export.arxiv.org/api/query?search_query=au:${encodeURIComponent(author)}&max_results=100&sortBy=submittedDate&sortOrder=descending`;
+    const url = `https://export.arxiv.org/api/query?search_query=au:${encodeURIComponent(author)}&max_results=100&sortBy=submittedDate&sortOrder=descending`;
 
     try {
       const response = await fetch(url);
@@ -1220,11 +1261,32 @@ class PublicationsManager {
    * Create a unique key for a publication (for deduplication)
    */
   createPublicationKey(pub) {
-    // Use title and year as the key (normalized)
-    const normalizedTitle = pub.title.toLowerCase()
+    // Prefer stable identifiers when available
+    const idParts = [];
+
+    if (pub && typeof pub.doi === 'string' && pub.doi.trim() !== '') {
+      idParts.push(`doi:${pub.doi.toLowerCase()}`);
+    }
+    if (pub && typeof pub.arxivId === 'string' && pub.arxivId.trim() !== '') {
+      idParts.push(`arxiv:${pub.arxivId.toLowerCase()}`);
+    }
+    if (pub && (typeof pub.putCode === 'string' || typeof pub.putCode === 'number')) {
+      // ORCID put-codes are numeric in the API response but may be stored as strings after
+      // JSON round-trips; accept both to be safe.
+      idParts.push(`orcid:${String(pub.putCode)}`);
+    }
+
+    if (idParts.length > 0) {
+      return idParts.join('|');
+    }
+
+    // Fallback: use normalized title and year
+    const rawTitle = pub && typeof pub.title === 'string' ? pub.title : '';
+    const normalizedTitle = rawTitle.toLowerCase()
       .replace(/[^a-z0-9]/g, '')
       .substring(0, 50);
-    return `${normalizedTitle}-${pub.year}`;
+    const yearPart = pub && pub.year != null ? String(pub.year) : '';
+    return `${normalizedTitle}-${yearPart}`;
   }
 
   /**
@@ -1362,8 +1424,10 @@ class PublicationsManager {
    * Now includes type tag (journal/conference/preprint) along with other links
    */
   renderPublicationItem(pub) {
-    const url = pub.url || '#';
-    const title = this.escapeHtml(pub.title);
+    // Sanitize URL: only allow http/https schemes to prevent XSS (e.g. javascript: URLs)
+    const rawUrl = pub.url || '';
+    const safeUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : '#';
+    const title = this.escapeHtml(pub.title || 'Untitled');
 
     // Use venue field, fallback to journalTitle
     const venueText = pub.venue || pub.journalTitle;
@@ -1377,13 +1441,13 @@ class PublicationsManager {
     links += `<span class="pub-type-tag" data-type="${pub.type}">${typeLabel}</span>`;
 
     // Add URL link
-    if (pub.url) {
+    if (safeUrl !== '#') {
       if (pub.arxivId) {
-        links += `<a href="${pub.url}">arXiv</a>`;
+        links += `<a href="${safeUrl}">arXiv</a>`;
       } else if (pub.doi) {
-        links += `<a href="${pub.url}">DOI</a>`;
+        links += `<a href="${safeUrl}">DOI</a>`;
       } else {
-        links += `<a href="${pub.url}">Link</a>`;
+        links += `<a href="${safeUrl}">Link</a>`;
       }
     }
 
@@ -1395,7 +1459,7 @@ class PublicationsManager {
         <span class="pub-year">${pub.year}</span>
         <div class="pub-content">
           <div class="pub-title">
-            <a href="${url}">${title}</a>
+            <a href="${safeUrl}">${title}</a>
           </div>
           ${authorsHtml ? `<div class="pub-authors">${authorsHtml}</div>` : ''}
           ${venue ? `<div class="pub-venue">${venue}</div>` : ''}
@@ -1507,16 +1571,19 @@ class PublicationsManager {
     // Escape the author string for safety
     const escaped = this.escapeHtml(authorString);
 
+    // Escape regex metacharacters in targetName so names with special chars don't break patterns
+    const safeName = targetName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     // Find and highlight all variations of the target name
     // This handles: "Polvara R", "R Polvara", "Polvara, R", "Riccardo Polvara", etc.
     const patterns = [
-      new RegExp(`\\b${targetName}\\s+[A-Z]\\b`, 'gi'),  // "Polvara R"
-      new RegExp(`\\b[A-Z]\\s+${targetName}\\b`, 'gi'),  // "R Polvara"
-      new RegExp(`\\b${targetName},?\\s+[A-Z]\\.?\\b`, 'gi'),  // "Polvara, R" or "Polvara R."
-      new RegExp(`\\b[A-Z]\\.?\\s+${targetName}\\b`, 'gi'),  // "R. Polvara"
-      new RegExp(`\\b\\w+\\s+${targetName}\\b`, 'gi'),  // "Riccardo Polvara"
-      new RegExp(`\\b${targetName}\\s+\\w+\\b`, 'gi'),  // "Polvara Riccardo"
-      new RegExp(`\\b${targetName}\\b`, 'gi')  // Just "Polvara"
+      new RegExp(`\\b${safeName}\\s+[A-Z]\\b`, 'gi'),  // "Polvara R"
+      new RegExp(`\\b[A-Z]\\s+${safeName}\\b`, 'gi'),  // "R Polvara"
+      new RegExp(`\\b${safeName},?\\s+[A-Z]\\.?\\b`, 'gi'),  // "Polvara, R" or "Polvara R."
+      new RegExp(`\\b[A-Z]\\.?\\s+${safeName}\\b`, 'gi'),  // "R. Polvara"
+      new RegExp(`\\b\\w+\\s+${safeName}\\b`, 'gi'),  // "Riccardo Polvara"
+      new RegExp(`\\b${safeName}\\s+\\w+\\b`, 'gi'),  // "Polvara Riccardo"
+      new RegExp(`\\b${safeName}\\b`, 'gi')  // Just "Polvara"
     ];
 
     let result = escaped;
