@@ -47,13 +47,45 @@
   <main class="section-white">
     <div class="container">
 
-      <!-- Filter buttons -->
-      <div class="pub-filter-bar" id="pub-filters">
-        <button class="btn active" data-filter="all">All</button>
-        <button class="btn" data-filter="journal">Journal Papers</button>
-        <button class="btn" data-filter="conference">Conference Papers</button>
-        <button class="btn" data-filter="other">Presentations &amp; Preprints</button>
+      <!-- Control bar with filters and refresh button -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Filter buttons -->
+        <div class="pub-filter-bar" id="pub-filters">
+          <button class="btn active" data-filter="all">All</button>
+          <button class="btn" data-filter="journal">Journal Papers</button>
+          <button class="btn" data-filter="conference">Conference Papers</button>
+          <button class="btn" data-filter="other">Presentations &amp; Preprints</button>
+        </div>
+
+        <!-- Refresh button -->
+        <button id="refresh-publications" class="btn btn-sm btn-outline-secondary" title="Refresh publications from ORCID/arXiv">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
       </div>
+
+      <!-- Loading indicator -->
+      <div id="publications-loading" class="text-center py-5" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading publications...</span>
+        </div>
+        <p class="mt-3 text-muted"><strong>Fetching publications from:</strong></p>
+        <ul class="list-unstyled text-muted" style="font-size: 0.9rem;">
+          <li>✓ ORCID (0000-0001-8318-7269)</li>
+          <li>✓ arXiv</li>
+          <li>✓ Crossref (for DOI enrichment)</li>
+          <li>✓ Semantic Scholar (for metadata enrichment)</li>
+          <li>✓ OpenAlex (for additional metadata)</li>
+        </ul>
+        <p class="text-muted" style="font-size: 0.85rem;">This may take a few moments...</p>
+      </div>
+
+      <!-- Error message -->
+      <div id="publications-error" class="alert alert-warning" style="display: none;" role="alert">
+        <strong>Note:</strong> Unable to fetch latest publications. Showing cached or fallback content.
+      </div>
+
+      <!-- Dynamic publications container -->
+      <div id="publications-container">
 
       <!-- ── Journal Papers ──────────────────────────────── -->
       <h3 class="pub-section-heading" data-section="journal">Journal Papers</h3>
@@ -534,6 +566,8 @@
 
       </ul>
 
+      </div><!-- End publications-container -->
+
     </div>
   </main>
 
@@ -560,26 +594,135 @@
     ga("create","UA-94119449-1","auto");ga("send","pageview");
   </script>
 
-  <!-- Publication filter -->
+  <!-- Publications Manager -->
+  <script src="js/publications.js"></script>
+
+  <!-- Publication filter and initialization -->
   <script>
-    document.querySelectorAll("#pub-filters .btn").forEach(function(btn) {
-      btn.addEventListener("click", function() {
-        document.querySelectorAll("#pub-filters .btn").forEach(function(b){ b.classList.remove("active"); });
-        this.classList.add("active");
-        var filter = this.dataset.filter;
-        document.querySelectorAll(".pub-item").forEach(function(item) {
-          item.style.display = (filter === "all" || item.dataset.type === filter) ? "" : "none";
-        });
-        document.querySelectorAll(".pub-section-heading").forEach(function(heading) {
-          var section = heading.dataset.section;
-          if (filter === "all" || filter === section) {
-            heading.style.display = "";
-          } else {
-            heading.style.display = "none";
+    // Initialize publications manager
+    let pubManager = null;
+    let useDynamicLoading = true; // Set to false to use static HTML only
+    let filtersInitialized = false; // Guard to ensure filter listeners are added only once
+
+    // Apply the current active filter to all pub-items and section headings.
+    // Called after each render (dynamic or static) to update visibility.
+    function applyActiveFilter() {
+      const activeBtn = document.querySelector("#pub-filters .btn.active");
+      const filter = activeBtn ? activeBtn.dataset.filter : "all";
+
+      // Show/hide individual publication items
+      document.querySelectorAll(".pub-item").forEach(function(item) {
+        item.style.display = (filter === "all" || item.dataset.type === filter) ? "" : "none";
+      });
+
+      // Show/hide section headings based on whether they have visible items below them
+      document.querySelectorAll(".pub-section-heading").forEach(function(heading) {
+        let hasVisibleItem = false;
+        let sibling = heading.nextElementSibling;
+        while (sibling && !sibling.classList.contains("pub-section-heading")) {
+          if (sibling.classList.contains("pub-item") && sibling.style.display !== "none") {
+            hasVisibleItem = true;
+            break;
           }
-        });
+          sibling = sibling.nextElementSibling;
+        }
+        heading.style.display = hasVisibleItem ? "" : "none";
+      });
+    }
+
+    // Filter functionality – listeners are registered once using event delegation
+    function setupFilters() {
+      if (filtersInitialized) {
+        // Listeners already attached; just re-apply the current filter to new content
+        applyActiveFilter();
+        return;
+      }
+      filtersInitialized = true;
+
+      document.getElementById("pub-filters").addEventListener("click", function(e) {
+        var btn = e.target.closest(".btn");
+        if (!btn) return;
+        document.querySelectorAll("#pub-filters .btn").forEach(function(b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        applyActiveFilter();
+      });
+    }
+
+    // Load publications dynamically
+    async function loadPublications(forceRefresh = false) {
+      const loadingEl = document.getElementById('publications-loading');
+      const errorEl = document.getElementById('publications-error');
+      const containerEl = document.getElementById('publications-container');
+
+      try {
+        // Show loading state
+        loadingEl.style.display = 'block';
+        errorEl.style.display = 'none';
+
+        // Initialize manager if needed
+        if (!pubManager) {
+          pubManager = new PublicationsManager({
+            orcidId: '0000-0001-8318-7269',
+            authorName: 'Riccardo Polvara',
+            cacheExpiration: 24 * 60 * 60 * 1000 // 24 hours
+          });
+        }
+
+        // Clear cache if force refresh
+        if (forceRefresh) {
+          pubManager.clearCache();
+        }
+
+        // Fetch publications
+        const publications = await pubManager.fetchPublications();
+
+        // Render publications
+        pubManager.renderPublications(publications, containerEl);
+
+        // Hide loading state
+        loadingEl.style.display = 'none';
+
+        // Setup filters
+        setupFilters();
+
+        console.log(`Successfully loaded ${publications.length} publications`);
+      } catch (error) {
+        console.error('Failed to load publications:', error);
+
+        // Hide loading state
+        loadingEl.style.display = 'none';
+
+        // Show error message (but keep fallback content)
+        errorEl.style.display = 'block';
+
+        // Make sure filters still work with fallback content
+        setupFilters();
+      }
+    }
+
+    // Refresh button handler
+    document.getElementById('refresh-publications').addEventListener('click', function() {
+      const btn = this;
+      const icon = btn.querySelector('i');
+
+      // Add spinning animation
+      icon.classList.add('fa-spin');
+      btn.disabled = true;
+
+      loadPublications(true).finally(() => {
+        icon.classList.remove('fa-spin');
+        btn.disabled = false;
       });
     });
+
+    // Initialize on page load
+    if (useDynamicLoading) {
+      // Try to load dynamically, but fallback to static content on error
+      loadPublications();
+    } else {
+      // Use static content only
+      setupFilters();
+    }
   </script>
 
   <script>
