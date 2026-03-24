@@ -1335,25 +1335,44 @@ class PublicationsManager {
    */
   mergePublications(...sources) {
     const merged = [];
-    const keyMap = new Map();      // primary key → pub
-    const titleYearMap = new Map(); // secondary key (title+year) → pub
+    const keyMap = new Map();       // primary key → pub
+    const titleYearMap = new Map(); // secondary key (title+year, exact) → pub
+    const titleOnlyMap = new Map(); // tertiary key (title only, for year-mismatch cross-source) → pub
 
     sources.forEach(source => {
       source.forEach(pub => {
         // Create a unique key for deduplication
         const key = this.createPublicationKey(pub);
 
-        // Look up by primary key first; fall back to title+year secondary key.
-        // The secondary lookup catches the common case where ORCID has a real
-        // DOI (key = "doi:…") for a paper that the arXiv API also returned with
-        // only an arXiv ID (key = "arxiv:…") — different primary keys but same paper.
+        // ── Level 1: primary key lookup ────────────────────────────────────
+        // Catches exact-identifier matches (doi:xxx, arxiv:xxx, orcid:xxx).
         let existing = keyMap.get(key);
+
+        // ── Level 2: title + year exact match ─────────────────────────────
+        // Catches same-year duplicates where sources disagree on the primary
+        // identifier (e.g. ORCID has a real DOI, arXiv has only arXiv ID).
         if (!existing) {
           const tyKey = this.createTitleYearKey(pub);
           if (tyKey) {
             existing = titleYearMap.get(tyKey);
             if (existing) {
-              // Register this new primary key so future dups with the same key merge too
+              keyMap.set(key, existing);
+            }
+          }
+        }
+
+        // ── Level 3: title-only match with year-proximity guard ────────────
+        // Catches duplicates where the year differs between sources — most
+        // commonly ORCID uses the journal publication year while arXiv stores
+        // the submission year (can differ by 1–2 years), or when ORCID has no
+        // date ('n.d.').  We allow a mismatch of up to 2 years to avoid
+        // accidentally merging genuinely different papers with similar titles.
+        if (!existing) {
+          const toKey = this.createTitleOnlyKey(pub);
+          if (toKey) {
+            const candidate = titleOnlyMap.get(toKey);
+            if (candidate && this.yearDifference(pub.year, candidate.year) <= 2) {
+              existing = candidate;
               keyMap.set(key, existing);
             }
           }
@@ -1365,6 +1384,10 @@ class PublicationsManager {
           const tyKey = this.createTitleYearKey(pub);
           if (tyKey && !titleYearMap.has(tyKey)) {
             titleYearMap.set(tyKey, pub);
+          }
+          const toKey = this.createTitleOnlyKey(pub);
+          if (toKey && !titleOnlyMap.has(toKey)) {
+            titleOnlyMap.set(toKey, pub);
           }
           merged.push(pub);
         } else {
@@ -1565,6 +1588,40 @@ class PublicationsManager {
     const yearPart = pub.year != null ? String(pub.year) : '';
     if (!normalizedTitle || !yearPart) return null;
     return `title:${normalizedTitle}-${yearPart}`;
+  }
+
+  /**
+   * Create a title-only deduplication key (no year component).
+   *
+   * Used as a tertiary fallback in mergePublications() to catch same-paper
+   * duplicates where the ORCID publication year differs from the arXiv
+   * submission year (e.g. ORCID has 2023, arXiv has 2022) or where the ORCID
+   * record has no publication date ('n.d.').  A year-proximity guard in the
+   * caller prevents false merges when the years are more than 2 years apart.
+   *
+   * Returns null when the title is missing.
+   */
+  createTitleOnlyKey(pub) {
+    if (!pub || typeof pub.title !== 'string' || !pub.title) return null;
+    const normalizedTitle = pub.title.toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .substring(0, 50);
+    if (!normalizedTitle) return null;
+    return `titleonly:${normalizedTitle}`;
+  }
+
+  /**
+   * Return the absolute year difference between two year values.
+   * Returns 0 when either value is missing or non-numeric (e.g. 'n.d.')
+   * so that the year-proximity guard always allows the merge — it is better
+   * to merge an undated ORCID record with an arXiv entry than to show a
+   * duplicate.
+   */
+  yearDifference(yearA, yearB) {
+    const a = parseInt(yearA, 10);
+    const b = parseInt(yearB, 10);
+    if (isNaN(a) || isNaN(b)) return 0; // one side is 'n.d.' — allow merge
+    return Math.abs(a - b);
   }
 
   saveToCache(publications) {
